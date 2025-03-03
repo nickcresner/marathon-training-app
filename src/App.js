@@ -310,7 +310,7 @@ function App() {
           <p>Marathon Training App - Built with React & Firebase</p>
           <div className="d-flex justify-content-center align-items-center mb-2">
             <img 
-              src={`${process.env.PUBLIC_URL}/images/logos/alzheimersheroeslogo.png`} 
+              src="https://nickcresner.github.io/marathon-training-app/images/logos/alzheimersheroeslogo.png" 
               alt="Alzheimer's Heroes Logo" 
               style={{ height: '50px', marginRight: '10px' }} 
             />
