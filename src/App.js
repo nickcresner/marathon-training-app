@@ -1,6 +1,6 @@
 // src/App.js
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -210,7 +210,7 @@ function App() {
   }
 
   return (
-    <Router basename="/marathon-training-app">
+    <Router>
       <Navigation user={user} onLogout={handleLogout} />
       
       <div className="container my-4">
@@ -300,7 +300,7 @@ function App() {
           <p>Marathon Training App - Built with React & Firebase</p>
           {!user && (
             <p className="small">
-              <a href="/login">Login</a> to link your own Google Sheet and save your progress
+              <Link to="/login" className="text-primary">Login</Link> to link your own Google Sheet and save your progress
             </p>
           )}
         </footer>

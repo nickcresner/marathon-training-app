@@ -65,6 +65,14 @@ function Register({ onRegister, onSwitchToLogin }) {
         <h3 className="mb-0">Register</h3>
       </div>
       <div className="card-body">
+        <div className="text-center mb-4">
+          <img 
+            src="/marathon-training-app/images/logos/pinnaclelogo1.png" 
+            alt="Pinnacle Fitness & Health" 
+            className="img-fluid" 
+            style={{ maxWidth: '150px' }}
+          />
+        </div>
         {error && (
           <div className="alert alert-danger" role="alert">
             {error}

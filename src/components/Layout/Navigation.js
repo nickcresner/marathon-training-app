@@ -40,7 +40,7 @@ function Navigation({ user, onLogout }) {
         <div className="container">
           <Link className="navbar-brand" to="/">
             <img 
-              src="https://pinnaclefh.com/cdn/shop/files/horizontal-logo.png" 
+              src="/marathon-training-app/images/logos/pinnaclelogo1.png" 
               alt="Pinnacle Fitness & Health" 
               className="brand-logo" 
             />
