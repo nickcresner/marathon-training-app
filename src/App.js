@@ -1,6 +1,6 @@
 // src/App.js
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -210,7 +210,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router basename="/marathon-training-app">
       <Navigation user={user} onLogout={handleLogout} />
       
       <div className="container my-4">

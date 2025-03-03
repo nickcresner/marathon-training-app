@@ -40,7 +40,7 @@ function Navigation({ user, onLogout }) {
         <div className="container">
           <Link className="navbar-brand" to="/">
             <img 
-              src="/marathon-training-app/images/logos/pinnaclelogo1.png" 
+              src={`${process.env.PUBLIC_URL}/images/logos/pinnaclelogo1.png`}
               alt="Pinnacle Fitness & Health" 
               className="brand-logo" 
             />

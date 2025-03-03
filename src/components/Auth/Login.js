@@ -54,7 +54,7 @@ function Login({ onLogin, onSwitchToRegister }) {
       <div className="card-body">
         <div className="text-center mb-4">
           <img 
-            src="/marathon-training-app/images/logos/pinnaclelogo1.png" 
+            src={`${process.env.PUBLIC_URL}/images/logos/pinnaclelogo1.png`}
             alt="Pinnacle Fitness & Health" 
             className="img-fluid" 
             style={{ maxWidth: '150px' }}
