@@ -9,6 +9,7 @@ function WorkoutDetail({ workouts, currentPhase }) {
   const [completed, setCompleted] = useState(false);
   const { workoutId } = useParams();
   const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
   
   useEffect(() => {
     const foundWorkout = workouts.find(w => w.id === workoutId);
@@ -18,6 +19,15 @@ function WorkoutDetail({ workouts, currentPhase }) {
     const completedWorkouts = JSON.parse(localStorage.getItem('completedWorkouts') || '{}');
     setCompleted(!!completedWorkouts[workoutId]);
   }, [workoutId, workouts]);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 576);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   const toggleCompleted = () => {
     const newCompletedState = !completed;
@@ -89,29 +99,29 @@ function WorkoutDetail({ workouts, currentPhase }) {
   const videoId = getYouTubeId(workout.videoUrl);
   
   return (
-    <div className="workout-detail">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
+    <div className="workout-detail has-bottom-nav">
+      <div className={`d-flex ${isMobile ? 'flex-column' : 'justify-content-between align-items-center'} mb-4`}>
+        <div className={isMobile ? "btn-stack-mobile mb-3" : ""}>
           <button 
             className="btn btn-outline-secondary me-2" 
             onClick={() => navigate(`/week/${workout.week}`)}
           >
-            Back to Week {workout.week}
+            <i className="bi bi-arrow-left me-1"></i> Back to Week {workout.week}
           </button>
           
           <button 
             className="btn btn-outline-primary" 
             onClick={() => navigate('/')}
           >
-            Home
+            <i className="bi bi-house me-1"></i> Home
           </button>
         </div>
         
         <button 
-          className={`btn ${completed ? 'btn-success' : 'btn-outline-success'}`}
+          className={`btn ${completed ? 'btn-success' : 'btn-outline-success'} ${isMobile ? 'w-100' : ''}`}
           onClick={toggleCompleted}
         >
-          {completed ? 'Completed ✓' : 'Mark as Complete'}
+          {completed ? <><i className="bi bi-check-circle me-1"></i> Completed</> : <><i className="bi bi-circle me-1"></i> Mark as Complete</>}
         </button>
       </div>
       
@@ -131,20 +141,23 @@ function WorkoutDetail({ workouts, currentPhase }) {
           {workout.exercises && workout.exercises.length > 0 ? (
             <div className="mb-4">
               <h4>Exercises</h4>
-              <div className="table-responsive">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Exercise</th>
-                      <th>Sets</th>
-                      <th>Reps</th>
-                      <th>Tempo</th>
-                      <th>Load</th>
-                      <th>Rest</th>
-                      <th>Notes</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+              
+              {/* Desktop View: Standard Table */}
+              <div className="d-none d-md-block">
+                <div className="table-responsive">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Exercise</th>
+                        <th>Sets</th>
+                        <th>Reps</th>
+                        <th>Tempo</th>
+                        <th>Load</th>
+                        <th>Rest</th>
+                        <th>Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                     {/* Get grouped exercises */}
                     {(() => {
                       const { warmups, supersets, regularExercises } = groupExercises();
@@ -310,6 +323,34 @@ function WorkoutDetail({ workouts, currentPhase }) {
                         </>
                       );
                     })()}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              {/* Mobile View */}
+              <div className="d-md-none table-responsive mt-2">
+                <table className="table table-sm mobile-exercise-table">
+                  <thead>
+                    <tr>
+                      <th>Exercise</th>
+                      <th>Sets × Reps</th>
+                      <th>Load</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {workout.exercises.map((exercise) => (
+                      <tr key={exercise.id}>
+                        <td>
+                          <Link to={`/workout/${workout.id}/exercise/${exercise.id}`} className="text-decoration-none">
+                            <strong>{exercise.name}</strong>
+                            {exercise.videoUrl && <i className="bi bi-play-circle ms-1 text-info"></i>}
+                          </Link>
+                        </td>
+                        <td>{exercise.sets} × {exercise.reps}</td>
+                        <td>{exercise.load || 'N/A'}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -322,7 +363,7 @@ function WorkoutDetail({ workouts, currentPhase }) {
           )}
           
           {videoId && (
-            <div className="workout-video mb-3">
+            <div className={`workout-video mb-3 ${isMobile ? 'mobile-video-container' : ''}`}>
               <h4>Workout Video</h4>
               <div className="ratio ratio-16x9">
                 <YouTube 
@@ -330,6 +371,7 @@ function WorkoutDetail({ workouts, currentPhase }) {
                   opts={{
                     playerVars: {
                       rel: 0,
+                      playsinline: 1, // Better for iOS
                     },
                   }} 
                 />
