@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/marathon-training-app/static/css/main.9231e01c.css",
-    "main.js": "/marathon-training-app/static/js/main.af9b1cb2.js",
+    "main.js": "/marathon-training-app/static/js/main.a7da816b.js",
     "static/js/453.19dce434.chunk.js": "/marathon-training-app/static/js/453.19dce434.chunk.js",
     "index.html": "/marathon-training-app/index.html",
     "main.9231e01c.css.map": "/marathon-training-app/static/css/main.9231e01c.css.map",
-    "main.af9b1cb2.js.map": "/marathon-training-app/static/js/main.af9b1cb2.js.map",
+    "main.a7da816b.js.map": "/marathon-training-app/static/js/main.a7da816b.js.map",
     "453.19dce434.chunk.js.map": "/marathon-training-app/static/js/453.19dce434.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9231e01c.css",
-    "static/js/main.af9b1cb2.js"
+    "static/js/main.a7da816b.js"
   ]
 }
