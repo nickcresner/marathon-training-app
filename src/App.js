@@ -210,7 +210,7 @@ function App() {
   }
 
   return (
-    <Router basename="/marathon-training-app">
+    <Router>
       <Navigation user={user} onLogout={handleLogout} />
       
       <div className="container my-4">
