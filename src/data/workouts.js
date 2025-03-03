@@ -577,7 +577,7 @@ function processWorkoutData(rows, phaseId, historyData = {}) {
       const exerciseId = `${phaseId}-week${weekToUse}-day${currentWorkout.dayNumber}-ex${currentWorkout.exercises.length + 1}`;
       
       // Store reference to this exercise for history mapping
-      exerciseMap[`exercise-${rowIndex}`] = exerciseId;
+      exerciseMap[`exercise-${index}`] = exerciseId;
       
       // Check if this is a warmup header
       if (firstCol && (firstCol.toLowerCase().includes('primers') || firstCol.toLowerCase().includes('switch'))) {
@@ -623,7 +623,7 @@ function processWorkoutData(rows, phaseId, historyData = {}) {
       const isWarmupExercise = currentWarmupType !== null;
       
       // Get any historical data for this exercise
-      const exerciseKey = `exercise-${rowIndex}`;
+      const exerciseKey = `exercise-${index}`;
       const exerciseHistory = historyData[exerciseKey] || [];
       
       // Format history data for the frontend
