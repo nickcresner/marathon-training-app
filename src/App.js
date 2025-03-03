@@ -6,7 +6,6 @@ import './App.css';
 
 // Firebase
 import { getCurrentUser } from './services/firebaseService';
-import configService from './services/configService';
 
 // Layout Components
 import Navigation from './components/Layout/Navigation';
@@ -66,12 +65,10 @@ function App() {
   // Get current phase information
   const currentPhaseInfo = TRAINING_PHASES.find(phase => phase.id === currentPhase) || TRAINING_PHASES[0];
   
-  // Log environment information
+  // Log initialization
   useEffect(() => {
     if (authChecked) {
-      configService.logDebug('App initialized with user:', user ? user.email : 'none');
-      configService.logDebug('Current environment:', configService.env);
-      configService.logDebug('Features enabled:', configService.features);
+      console.log('App initialized with user:', user ? user.email : 'none');
     }
   }, [authChecked, user]);
   
@@ -315,16 +312,6 @@ function App() {
             <p className="small">
               <Link to="/login" className="text-primary">Login</Link> to link your own Google Sheet and save your progress
             </p>
-          )}
-          {configService.isDevelopment && (
-            <div className="small mt-2 py-1 px-2 bg-light rounded">
-              <span className="badge bg-info text-dark me-2">ENV: {configService.env.toUpperCase()}</span>
-              {Object.entries(configService.features)
-                .filter(([name, enabled]) => enabled)
-                .map(([name]) => (
-                  <span key={name} className="badge bg-secondary me-1">{name}</span>
-                ))}
-            </div>
           )}
         </footer>
       </div>

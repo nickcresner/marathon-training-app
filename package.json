@@ -22,17 +22,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start:test": "env-cmd -f .env.test react-scripts start",
-    "start:prod": "env-cmd -f .env.production react-scripts start",
     "build": "react-scripts build",
-    "build:test": "env-cmd -f .env.test react-scripts build",
-    "build:prod": "env-cmd -f .env.production react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build:prod",
+    "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "deploy:test": "firebase deploy --only hosting:test",
-    "deploy:prod": "firebase deploy --only hosting:production"
+    "firebase-deploy": "firebase deploy --only hosting"
   },
   "eslintConfig": {
     "extends": [

@@ -2,16 +2,11 @@
 
 ## Build Commands
 - Start development server: `npm start`
-- Start test environment: `npm run start:test`
-- Start production environment: `npm run start:prod`
-- Build for production: `npm run build:prod`
-- Build for test: `npm run build:test`
+- Build for production: `npm run build`
 - Run tests: `npm test`
 - Run single test: `npm test -- -t "test name"`
-- Deploy to test: `npm run deploy:test`
-- Deploy to production: `npm run deploy:prod`
 - Deploy to GitHub Pages: `npm run deploy`
-- Deploy using script: `./scripts/deploy-all.sh [test|prod|gh-pages|all]`
+- Deploy to Firebase: `npm run firebase-deploy`
 - Eject from create-react-app: `npm run eject`
 
 ## Code Style Guidelines
@@ -32,12 +27,3 @@
 - JSX format: spaces inside curly braces { value }
 - Use React Testing Library for component tests
 
-## Environments
-- Development: Local development environment (`npm start`)
-- Test: Testing/QA environment (`npm run start:test`)
-- Production: Live environment (`npm run start:prod`)
-
-## Environment Configuration
-- Use configService from './services/configService' for environment-specific code
-- Feature flags are defined in configService.features
-- Use configService.logDebug() for non-production logging
