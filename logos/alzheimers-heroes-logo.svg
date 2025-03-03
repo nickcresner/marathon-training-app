@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+  <rect width="200" height="60" fill="#ffffff"/>
+  <text x="10" y="36" font-family="Arial" font-size="16" font-weight="bold" fill="#7030A0">Alzheimer's Heroes</text>
+  <path d="M170 15 Q180 5, 190 15 T210 15" stroke="#FF9900" stroke-width="2" fill="none"/>
+  <path d="M170 25 Q180 15, 190 25 T210 25" stroke="#FF9900" stroke-width="2" fill="none"/>
+  <path d="M170 35 Q180 25, 190 35 T210 35" stroke="#FF9900" stroke-width="2" fill="none"/>
+</svg>
