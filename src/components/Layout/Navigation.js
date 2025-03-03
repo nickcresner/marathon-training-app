@@ -56,6 +56,9 @@ function Navigation({ user, onLogout }) {
                 <li className="nav-item">
                   <Link className="nav-link" to="/settings">Settings</Link>
                 </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/onboarding">Setup Wizard</Link>
+                </li>
               </>
             )}
           </ul>

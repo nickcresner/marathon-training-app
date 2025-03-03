@@ -23,6 +23,9 @@ import AuthContainer from './components/Auth/AuthContainer';
 import UserSettings from './components/Settings/UserSettings';
 import HelpCenter from './components/Help/HelpCenter';
 
+// Onboarding Components
+import OnboardingContainer from './components/Onboarding/OnboardingContainer';
+
 // Import data fetching service
 import { fetchWorkouts, TRAINING_PHASES, groupWeeksIntoBlocks } from './data/workouts';
 import { getGoogleSheetSettings } from './services/firebaseService';
@@ -36,6 +39,7 @@ function App() {
   // User authentication state
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
   
   // Check if user is logged in
   useEffect(() => {
@@ -43,6 +47,11 @@ function App() {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
+        
+        // Check if user needs onboarding
+        if (currentUser) {
+          await checkUserOnboardingStatus(currentUser.uid);
+        }
       } catch (error) {
         console.error("Auth check error:", error);
       } finally {
@@ -129,10 +138,24 @@ function App() {
   // Handle user authentication
   const handleAuthSuccess = (user) => {
     setUser(user);
+    // Check if the user needs onboarding
+    checkUserOnboardingStatus(user.uid);
   };
   
   const handleLogout = () => {
     setUser(null);
+    setNeedsOnboarding(false);
+  };
+  
+  // Check if user needs onboarding
+  const checkUserOnboardingStatus = async (userId) => {
+    try {
+      const settings = await getGoogleSheetSettings(userId);
+      setNeedsOnboarding(!settings);
+    } catch (error) {
+      console.error("Error checking user onboarding status:", error);
+      setNeedsOnboarding(true);
+    }
   };
   
   // Extract unique weeks from current phase
@@ -187,7 +210,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router basename="/marathon-training-app">
       <Navigation user={user} onLogout={handleLogout} />
       
       <div className="container my-4">
@@ -196,15 +219,19 @@ function App() {
           <Route 
             path="/" 
             element={
-              <BlockSelection 
-                weeks={weeks} 
-                weekBlocks={weekBlocks}
-                phases={TRAINING_PHASES} 
-                currentPhase={currentPhase}
-                workouts={workouts}
-                onPhaseChange={handlePhaseChange}
-                user={user}
-              />
+              needsOnboarding && user ? (
+                <Navigate to="/onboarding" />
+              ) : (
+                <BlockSelection 
+                  weeks={weeks} 
+                  weekBlocks={weekBlocks}
+                  phases={TRAINING_PHASES} 
+                  currentPhase={currentPhase}
+                  workouts={workouts}
+                  onPhaseChange={handlePhaseChange}
+                  user={user}
+                />
+              )
             } 
           />
           <Route 
@@ -239,6 +266,16 @@ function App() {
           <Route 
             path="/login" 
             element={<AuthContainer onAuthSuccess={handleAuthSuccess} />} 
+          />
+          
+          {/* Onboarding Route */}
+          <Route 
+            path="/onboarding" 
+            element={
+              <ProtectedRoute>
+                <OnboardingContainer user={user} />
+              </ProtectedRoute>
+            } 
           />
           
           {/* Protected Routes */}
