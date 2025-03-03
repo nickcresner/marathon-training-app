@@ -308,23 +308,16 @@ function App() {
         {/* App Footer */}
         <footer className="mt-5 pt-3 text-center text-muted border-top">
           <p>Marathon Training App - Built with React & Firebase</p>
-          <div className="d-flex align-items-center justify-content-center mb-2">
-            <img 
-              src={`${process.env.PUBLIC_URL}/logos/alzheimers-heroes-logo.svg`} 
-              alt="Alzheimer's Heroes Logo" 
-              style={{ height: '40px', marginRight: '10px' }} 
-            />
-            <p className="mb-0">
-              Built for <a 
-                href="https://alzheimersheroes.co.uk" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                style={{ color: '#FF9900', fontWeight: 'bold' }}
-              >
-                Alzheimer's Heroes
-              </a> charity
-            </p>
-          </div>
+          <p className="mb-2" style={{ color: '#FF9900', fontWeight: 'bold' }}>
+            Built for <a 
+              href="https://alzheimersheroes.co.uk" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              style={{ color: '#FF9900', fontWeight: 'bold', textDecoration: 'underline' }}
+            >
+              Alzheimer's Heroes
+            </a> charity
+          </p>
           {!user && (
             <p className="small">
               <Link to="/login" className="text-primary">Login</Link> to link your own Google Sheet and save your progress
