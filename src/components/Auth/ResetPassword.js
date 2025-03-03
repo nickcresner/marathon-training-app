@@ -1,12 +1,30 @@
 // src/components/Auth/ResetPassword.js
 import React, { useState } from 'react';
-import { resetPassword } from '../../services/firebaseService';
+import { resetPassword, getCurrentUser } from '../../services/firebaseService';
 
 function ResetPassword({ onSwitchToLogin }) {
   const [email, setEmail] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Check if user is already logged in
+  React.useEffect(() => {
+    const checkCurrentUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          console.log("User already logged in during password reset");
+          // Pre-fill email if we have a logged in user
+          setEmail(currentUser.email || '');
+        }
+      } catch (error) {
+        console.error("Error checking current user:", error);
+      }
+    };
+    
+    checkCurrentUser();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -110,19 +128,56 @@ function ResetPassword({ onSwitchToLogin }) {
         ) : (
           <button
             className="btn btn-success w-100"
-            onClick={onSwitchToLogin}
+            onClick={() => {
+              // Check if the user is already logged in before switching back
+              (async () => {
+                try {
+                  const currentUser = await getCurrentUser();
+                  if (currentUser) {
+                    console.log("User already authenticated after reset, redirecting");
+                    // This will redirect to home with the auth status updated
+                    window.location.href = '/marathon-training-app/';
+                    return;
+                  }
+                  onSwitchToLogin();
+                } catch (err) {
+                  console.error("Error when returning to login:", err);
+                  onSwitchToLogin();
+                }
+              })();
+            }}
           >
             Return to Login
           </button>
         )}
         
-        <div className="mt-3 text-center">
-          <p>
-            <button className="btn btn-link p-0" onClick={onSwitchToLogin}>
-              Back to Login
-            </button>
-          </p>
-        </div>
+        {!success && (
+          <div className="mt-3 text-center">
+            <p>
+              <button 
+                className="btn btn-link p-0" 
+                onClick={() => {
+                  // Also check auth status when going back to login
+                  (async () => {
+                    try {
+                      const currentUser = await getCurrentUser();
+                      if (currentUser) {
+                        console.log("User already authenticated, redirecting");
+                        window.location.href = '/marathon-training-app/';
+                        return;
+                      }
+                      onSwitchToLogin();
+                    } catch (err) {
+                      onSwitchToLogin();
+                    }
+                  })();
+                }}
+              >
+                Back to Login
+              </button>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

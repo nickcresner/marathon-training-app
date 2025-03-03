@@ -1,6 +1,6 @@
 // src/components/Auth/Login.js
 import React, { useState } from 'react';
-import { loginUser } from '../../services/firebaseService';
+import { loginUser, getCurrentUser } from '../../services/firebaseService';
 
 function Login({ onLogin, onSwitchToRegister, onSwitchToResetPassword, justResetPassword }) {
   const [email, setEmail] = useState('');
@@ -17,6 +17,23 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToResetPassword, justReset
       setSuccessMessage(null);
     }
   }, [justResetPassword]);
+  
+  // Also check for current user on mount
+  React.useEffect(() => {
+    const checkCurrentUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          console.log("User already logged in in Login component");
+          onLogin(currentUser);
+        }
+      } catch (error) {
+        console.error("Error checking current user:", error);
+      }
+    };
+    
+    checkCurrentUser();
+  }, [onLogin]);
   
   const handleSubmit = async (e) => {
     e.preventDefault();
