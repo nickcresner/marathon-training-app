@@ -35,7 +35,11 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToResetPassword, justReset
       console.log("Attempting login with:", email);
       const user = await loginUser(email, password);
       console.log("Login successful:", user);
-      onLogin(user);
+      
+      // Add slight delay to ensure the user sees the loading state
+      setTimeout(() => {
+        onLogin(user);
+      }, 500);
     } catch (error) {
       console.error("Login error:", error);
       // Provide more user-friendly error messages
@@ -141,10 +145,15 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToResetPassword, justReset
           </div>
           <button
             type="submit"
-            className="btn btn-primary w-100"
+            className="btn btn-primary w-100 position-relative"
             disabled={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Logging in...
+              </>
+            ) : 'Login'}
           </button>
         </form>
         <div className="mt-3 text-center">

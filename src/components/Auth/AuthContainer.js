@@ -5,8 +5,15 @@ import Register from './Register';
 import ResetPassword from './ResetPassword';
 
 function AuthContainer({ onAuthSuccess }) {
+  console.log("AuthContainer rendered");
   const [authView, setAuthView] = useState('login'); // 'login', 'register', or 'resetPassword'
   const [justResetPassword, setJustResetPassword] = useState(false);
+  
+  // Handle authentication success
+  const handleAuthSuccess = (user) => {
+    console.log("Auth success in container, passing to parent");
+    onAuthSuccess(user);
+  };
   
   const handleSwitchToRegister = () => {
     setAuthView('register');
@@ -28,7 +35,7 @@ function AuthContainer({ onAuthSuccess }) {
         <div className="col-md-6">
           {authView === 'login' && (
             <Login 
-              onLogin={onAuthSuccess} 
+              onLogin={handleAuthSuccess} 
               onSwitchToRegister={handleSwitchToRegister}
               onSwitchToResetPassword={handleSwitchToResetPassword}
               justResetPassword={justResetPassword}
@@ -37,7 +44,7 @@ function AuthContainer({ onAuthSuccess }) {
           
           {authView === 'register' && (
             <Register 
-              onRegister={onAuthSuccess} 
+              onRegister={handleAuthSuccess} 
               onSwitchToLogin={() => handleSwitchToLogin(false)} 
             />
           )}

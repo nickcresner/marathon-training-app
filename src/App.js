@@ -140,6 +140,9 @@ function App() {
     setUser(user);
     // Check if the user needs onboarding
     checkUserOnboardingStatus(user.uid);
+    
+    // Add console log to track authentication flow
+    console.log("Authentication successful, user set:", user.email);
   };
   
   const handleLogout = () => {

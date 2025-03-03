@@ -48,7 +48,17 @@ export const loginUser = async (email, password) => {
     console.log("Attempting Firebase login with:", email);
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     console.log("Firebase login successful:", userCredential);
-    return userCredential.user;
+    
+    // Extract only necessary user data to prevent serialization issues
+    const user = userCredential.user;
+    return {
+      uid: user.uid,
+      email: user.email,
+      emailVerified: user.emailVerified,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
+      isAuthenticated: true
+    };
   } catch (error) {
     console.error("Firebase login error:", error);
     // Preserve the error code for better error handling
