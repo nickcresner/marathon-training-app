@@ -14,41 +14,33 @@ const GOOGLE_SHEET_BASE_URL = 'https://api.allorigins.win/raw?url=' +
 // Available training phase tabs in the Google Sheet with their week ranges
 export const TRAINING_PHASES = [
   { 
-    id: 'base', 
-    name: 'Base Phase (Weeks 1-4)', 
-    gid: '1194353959', // Week 1-4 tab GID
-    description: 'Foundation phase focusing on building basic strength and form',
+    id: 'strength', 
+    name: 'Strength Training', 
+    gid: '1194353959', // First tab GID
+    description: 'Upper and lower body strength training workouts',
     weekStart: 1,
-    weekEnd: 4
+    weekEnd: 16
   },
   { 
-    id: 'build', 
-    name: 'Build Phase (Weeks 5-8)', 
-    gid: '278447527', // Week 5-8 tab GID
-    description: 'Progressive overload phase with increased intensity',
-    weekStart: 5,
-    weekEnd: 8
+    id: 'conditioning', 
+    name: 'Conditioning', 
+    gid: '278447527', // Second tab GID
+    description: 'Cardio conditioning and interval training',
+    weekStart: 1,
+    weekEnd: 16
   },
   { 
-    id: 'peak', 
-    name: 'Peak Phase (Weeks 9-12)', 
-    gid: '1344676238', // Week 9-12 tab GID
-    description: 'Race preparation with peak performance workouts',
-    weekStart: 9,
-    weekEnd: 12
-  },
-  { 
-    id: 'taper', 
-    name: 'Taper Phase (Weeks 13-16)', 
-    gid: '0', // Default to first tab if you don't have a taper tab yet
-    description: 'Pre-race tapering to maximize race day performance',
-    weekStart: 13,
+    id: 'mobility', 
+    name: 'Mobility', 
+    gid: '1344676238', // Third tab GID
+    description: 'Flexibility and mobility exercises',
+    weekStart: 1,
     weekEnd: 16
   }
 ];
 
 // Default to the first phase if none specified
-export async function fetchWorkouts(phaseId = 'base', userSheetUrl = null) {
+export async function fetchWorkouts(phaseId = 'strength', userSheetUrl = null) {
   try {
     // Find the selected phase
     const selectedPhase = TRAINING_PHASES.find(phase => phase.id === phaseId) || TRAINING_PHASES[0];

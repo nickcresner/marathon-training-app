@@ -3,6 +3,12 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function BlockSelection({ weeks, weekBlocks, phases, currentPhase, onPhaseChange, workouts }) {
+  // Directly go to specific tab when selecting a training phase
+  const handlePhaseClick = (phaseId) => {
+    onPhaseChange(phaseId);
+    // Scroll to the training blocks section
+    document.getElementById('training-blocks').scrollIntoView({ behavior: 'smooth' });
+  };
   // Debug info
   useEffect(() => {
     console.log(`BlockSelection rendering for phase: ${currentPhase}`);
@@ -14,14 +20,14 @@ function BlockSelection({ weeks, weekBlocks, phases, currentPhase, onPhaseChange
     }
   }, [currentPhase, weeks, workouts]);
   // Find the current phase object
-  const phaseInfo = phases.find(phase => phase.id === currentPhase) || phases[0];
+  const currentPhaseInfo = phases.find(phase => phase.id === currentPhase) || phases[0];
   
-  // Define week block descriptions
+  // Define week block descriptions - using generic descriptions since we now match Google Sheet tabs directly
   const blockDescriptions = {
-    1: 'Foundation phase with focus on building basic strength and form',
-    2: 'Progressive overload phase with increased intensity',
-    3: 'Peak performance phase with race-specific training',
-    4: 'Tapering phase to prepare for race day'
+    1: 'First block of training sessions',
+    2: 'Second block of training sessions',
+    3: 'Third block of training sessions',
+    4: 'Fourth block of training sessions'
   };
   
   return (
@@ -38,13 +44,12 @@ function BlockSelection({ weeks, weekBlocks, phases, currentPhase, onPhaseChange
             <div key={phase.id} className="col-md-6 col-lg-3 mb-4">
               <div 
                 className={`phase-card ${currentPhase === phase.id ? 'active' : ''}`}
-                onClick={() => onPhaseChange(phase.id)}
+                onClick={() => handlePhaseClick(phase.id)}
               >
                 <div className="phase-icon">
-                  {phase.id === 'base' && <i className="bi bi-building-fill"></i>}
-                  {phase.id === 'build' && <i className="bi bi-graph-up-arrow"></i>}
-                  {phase.id === 'peak' && <i className="bi bi-lightning-charge-fill"></i>}
-                  {phase.id === 'taper' && <i className="bi bi-speedometer2"></i>}
+                  {phase.id === 'strength' && <i className="bi bi-activity"></i>}
+                  {phase.id === 'conditioning' && <i className="bi bi-heart-pulse"></i>}
+                  {phase.id === 'mobility' && <i className="bi bi-person-walking"></i>}
                 </div>
                 <h3 className="phase-title">{phase.name}</h3>
                 <p className="phase-desc">{phase.description}</p>
@@ -62,20 +67,20 @@ function BlockSelection({ weeks, weekBlocks, phases, currentPhase, onPhaseChange
         {/* Current Phase Description */}
         <div className="col-12 mt-3">
           <div className="alert alert-info text-center">
-            <strong>{phaseInfo.name}</strong>
-            <p className="mb-0 mt-1">{phaseInfo.description}</p>
+            <strong>{currentPhaseInfo.name}</strong>
+            <p className="mb-0 mt-1">{currentPhaseInfo.description}</p>
             <p className="mb-0 mt-2 small">
-              <strong>Week Range:</strong> Weeks {phaseInfo.weekStart} through {phaseInfo.weekEnd} of your training plan
+              <strong>Training Type:</strong> {currentPhaseInfo.name} workouts from your training plan
             </p>
           </div>
         </div>
       </div>
       
       {/* Training Blocks Grid */}
-      <div className="row">
+      <div className="row" id="training-blocks">
         <div className="col-12 mb-4">
-          <h3 className="text-center">Training Blocks</h3>
-          <p className="text-center text-muted">Select a training block to view weeks</p>
+          <h3 className="text-center">Training Weeks</h3>
+          <p className="text-center text-muted">Select a week to view workouts</p>
         </div>
         
         {weekBlocks.length === 0 ? (
@@ -93,14 +98,13 @@ function BlockSelection({ weeks, weekBlocks, phases, currentPhase, onPhaseChange
                 </div>
                 <div className="card-body">
                   <div className="mb-3">
-                    <div className="phase-icon mb-2">
-                      {block.id === 1 && <i className="bi bi-building-fill"></i>}
-                      {block.id === 2 && <i className="bi bi-graph-up-arrow"></i>}
-                      {block.id === 3 && <i className="bi bi-lightning-charge-fill"></i>}
-                      {block.id === 4 && <i className="bi bi-speedometer2"></i>}
+                    <div className="text-center mb-3">
+                      <span className="badge bg-primary rounded-pill fs-6 px-3 py-2">
+                        {currentPhaseInfo.name}
+                      </span>
                     </div>
-                    <p className="card-text">
-                      {blockDescriptions[block.id] || 'Structured strength and conditioning workouts'}
+                    <p className="card-text text-center fs-5">
+                      View workouts for these weeks
                     </p>
                   </div>
                   

@@ -65,10 +65,16 @@ function App() {
   // Get current phase information
   const currentPhaseInfo = TRAINING_PHASES.find(phase => phase.id === currentPhase) || TRAINING_PHASES[0];
   
-  // Log initialization
+  // Log initialization and load saved phase
   useEffect(() => {
     if (authChecked) {
       console.log('App initialized with user:', user ? user.email : 'none');
+      
+      // Try to load saved phase from localStorage
+      const savedPhase = localStorage.getItem('selectedPhase');
+      if (savedPhase && TRAINING_PHASES.some(p => p.id === savedPhase)) {
+        setCurrentPhase(savedPhase);
+      }
     }
   }, [authChecked, user]);
   
@@ -179,6 +185,8 @@ function App() {
     if (phaseId !== currentPhase) {
       console.log(`Changing phase from ${currentPhase} to ${phaseId}`);
       setCurrentPhase(phaseId);
+      // Save selection to localStorage
+      localStorage.setItem('selectedPhase', phaseId);
       // Force reload workouts when phase changes
       setIsLoading(true);
     }
@@ -307,7 +315,6 @@ function App() {
         
         {/* App Footer */}
         <footer className="mt-5 pt-3 text-center text-muted border-top">
-          <p>Marathon Training App - Built with React & Firebase</p>
           <div className="d-flex justify-content-center align-items-center mb-2">
             <img 
               src="https://nickcresner.github.io/marathon-training-app/images/logos/alzheimersheroeslogo.png" 
@@ -322,7 +329,7 @@ function App() {
                 style={{ color: '#FF9900', fontWeight: 'bold', textDecoration: 'underline' }}
               >
                 Alzheimer's Heroes
-              </a> charity
+              </a>
             </p>
           </div>
           {!user && (
