@@ -1,0 +1,40 @@
+{
+  "hosting": {
+    "targets": {
+      "production": {
+        "hosting": {
+          "site": "marathon-training-app-15f96",
+          "public": "build",
+          "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+          ],
+          "rewrites": [
+            {
+              "source": "**",
+              "destination": "/index.html"
+            }
+          ]
+        }
+      },
+      "test": {
+        "hosting": {
+          "site": "marathon-training-app-test",
+          "public": "build",
+          "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+          ],
+          "rewrites": [
+            {
+              "source": "**",
+              "destination": "/index.html"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

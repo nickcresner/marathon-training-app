@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "marathon-training-app-15f96"
+  },
+  "targets": {
+    "marathon-training-app-15f96": {
+      "hosting": {
+        "production": [
+          "marathon-training-app-15f96"
+        ],
+        "test": [
+          "marathon-training-app-test"
+        ]
+      }
+    }
+  }
+}
