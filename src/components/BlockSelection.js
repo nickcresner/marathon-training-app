@@ -33,16 +33,28 @@ function BlockSelection({ weeks, weekBlocks, phases, currentPhase, onPhaseChange
           <p className="text-center text-muted">Select your training phase</p>
         </div>
         
-        <div className="d-flex justify-content-center flex-wrap">
+        <div className="row justify-content-center">
           {phases.map(phase => (
-            <div key={phase.id} className="m-2">
-              <button
-                type="button"
-                className={`btn btn-lg ${currentPhase === phase.id ? 'btn-primary' : 'btn-outline-primary'}`}
+            <div key={phase.id} className="col-md-6 col-lg-3 mb-4">
+              <div 
+                className={`phase-card ${currentPhase === phase.id ? 'active' : ''}`}
                 onClick={() => onPhaseChange(phase.id)}
               >
-                {phase.name}
-              </button>
+                <div className="phase-icon">
+                  {phase.id === 'base' && <i className="bi bi-building-fill"></i>}
+                  {phase.id === 'build' && <i className="bi bi-graph-up-arrow"></i>}
+                  {phase.id === 'peak' && <i className="bi bi-lightning-charge-fill"></i>}
+                  {phase.id === 'taper' && <i className="bi bi-speedometer2"></i>}
+                </div>
+                <h3 className="phase-title">{phase.name}</h3>
+                <p className="phase-desc">{phase.description}</p>
+                <button
+                  type="button"
+                  className={`btn ${currentPhase === phase.id ? 'btn-primary' : 'btn-outline-primary'} mt-3`}
+                >
+                  {currentPhase === phase.id ? 'Selected' : 'Select'}
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -75,28 +87,37 @@ function BlockSelection({ weeks, weekBlocks, phases, currentPhase, onPhaseChange
         ) : (
           weekBlocks.map(block => (
             <div key={block.id} className="col-md-6 mb-4">
-              <div className="card h-100">
+              <div className="card h-100 fade-in">
                 <div className="card-header bg-primary text-white">
                   <h5 className="card-title mb-0">{block.label}</h5>
                 </div>
                 <div className="card-body">
-                  <p className="card-text">
-                    {blockDescriptions[block.id] || 'Structured strength and conditioning workouts'}
-                  </p>
+                  <div className="mb-3">
+                    <div className="phase-icon mb-2">
+                      {block.id === 1 && <i className="bi bi-building-fill"></i>}
+                      {block.id === 2 && <i className="bi bi-graph-up-arrow"></i>}
+                      {block.id === 3 && <i className="bi bi-lightning-charge-fill"></i>}
+                      {block.id === 4 && <i className="bi bi-speedometer2"></i>}
+                    </div>
+                    <p className="card-text">
+                      {blockDescriptions[block.id] || 'Structured strength and conditioning workouts'}
+                    </p>
+                  </div>
                   
                   <div className="d-flex flex-wrap mb-3">
                     {block.weeks.map(week => (
                       <Link 
                         key={week} 
                         to={`/week/${week}`}
-                        className="btn btn-outline-primary m-1"
+                        className="week-btn m-1"
                       >
                         Week {week}
                       </Link>
                     ))}
                   </div>
                   
-                  <div className="text-muted small">
+                  <div className="text-muted small mt-3">
+                    <i className="bi bi-calendar-check me-2"></i>
                     Contains {block.weeks.length} weeks with {
                       weeks.filter(w => block.weeks.includes(w)).length > 0 
                         ? weeks.filter(w => block.weeks.includes(w)).reduce((count, w) => {

@@ -43,25 +43,34 @@ function WorkoutList({ workouts, currentPhase }) {
   
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2>Week {weekId} Workouts</h2>
-          <p className="text-muted mb-0">
-            <strong>{phaseInfo.name}</strong>
-          </p>
+          <h2 className="workout-title">Week {weekId} <span className="text-primary">Workouts</span></h2>
+          <div className="d-flex align-items-center">
+            <div className="badge badge-primary me-2">
+              {phaseInfo.name}
+            </div>
+            <p className="text-muted mb-0">
+              <i className="bi bi-calendar-week me-1"></i> Training days for week {weekId}
+            </p>
+          </div>
         </div>
         <button 
-          className="btn btn-outline-secondary" 
+          className="btn btn-outline-primary" 
           onClick={() => navigate('/')}
         >
-          Back to Training Plan
+          <i className="bi bi-arrow-left me-1"></i> Back to Plan
         </button>
       </div>
       
-      <div className="alert alert-light border mb-4">
-        <p className="mb-0">
-          <strong>Phase Description:</strong> {phaseInfo.description}
-        </p>
+      <div className="alert alert-info mb-4">
+        <div className="d-flex align-items-center">
+          <i className="bi bi-info-circle-fill me-3 fs-4"></i>
+          <div>
+            <h5 className="alert-heading mb-1">{phaseInfo.name}</h5>
+            <p className="mb-0">{phaseInfo.description}</p>
+          </div>
+        </div>
       </div>
       
       {sortedWorkouts.length === 0 ? (
@@ -71,31 +80,50 @@ function WorkoutList({ workouts, currentPhase }) {
           <p className="text-muted mb-3">
             Found {sortedWorkouts.length} workouts for Week {weekId} in {currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1)} Phase.
           </p>
-          <div className="list-group">
+          <div className="row">
             {sortedWorkouts.map(workout => (
-              <Link 
-                key={workout.id}
-                to={`/workout/${workout.id}`}
-                className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-              >
-                <div>
-                  <strong>{workout.title}</strong>
-                  <p className="mb-0 text-muted small">
-                    {workout.exercises ? `${workout.exercises.length} exercises` : ''} 
-                    {workout.duration && ` • ${workout.duration}`}
+              <div key={workout.id} className="col-md-6 col-lg-4 mb-4">
+                <Link 
+                  to={`/workout/${workout.id}`}
+                  className="card h-100 text-decoration-none slide-in"
+                  style={{ transition: 'all 0.3s ease' }}
+                >
+                  <div className="card-body d-flex flex-column">
+                    <div className="workout-day">
+                      {workout.day}
+                    </div>
+                    <h4 className="mb-3">{workout.title.replace(/Day \d+:\s*/, '')}</h4>
                     
-                    {/* Show superset information if any exercises are in supersets */}
-                    {workout.exercises && workout.exercises.some(ex => ex.isPartOfSuperset) && (
-                      <span className="ms-2 text-primary">
-                        • Contains supersets
+                    <div className="mb-3 flex-grow-1">
+                      <p className="text-muted small mb-2">{workout.description}</p>
+                      <div className="d-flex align-items-center mb-2">
+                        <i className="bi bi-lightning me-2 text-warning"></i>
+                        <span>{workout.exercises ? `${workout.exercises.length} exercises` : ''}</span>
+                      </div>
+                      <div className="d-flex align-items-center mb-2">
+                        <i className="bi bi-clock me-2 text-info"></i>
+                        <span>{workout.duration}</span>
+                      </div>
+                      
+                      {/* Show superset information */}
+                      {workout.exercises && workout.exercises.some(ex => ex.isPartOfSuperset) && (
+                        <div className="d-flex align-items-center">
+                          <i className="bi bi-repeat me-2 text-primary"></i>
+                          <span className="superset-badge">
+                            Contains supersets
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="mt-auto text-end">
+                      <span className="btn btn-sm btn-primary">
+                        View Workout <i className="bi bi-arrow-right ms-1"></i>
                       </span>
-                    )}
-                  </p>
-                </div>
-                <span className="badge bg-primary rounded-pill">
-                  View
-                </span>
-              </Link>
+                    </div>
+                  </div>
+                </Link>
+              </div>
             ))}
           </div>
         </div>
