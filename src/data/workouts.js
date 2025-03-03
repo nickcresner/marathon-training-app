@@ -15,27 +15,27 @@ const GOOGLE_SHEET_BASE_URL = 'https://api.allorigins.win/raw?url=' +
 export const TRAINING_PHASES = [
   { 
     id: 'strength', 
-    name: 'Strength Training', 
+    name: 'Week 1-4', 
     gid: '1194353959', // First tab GID
     description: 'Upper and lower body strength training workouts',
     weekStart: 1,
-    weekEnd: 16
+    weekEnd: 4
   },
   { 
     id: 'conditioning', 
-    name: 'Conditioning', 
+    name: 'Week 5-8', 
     gid: '278447527', // Second tab GID
     description: 'Cardio conditioning and interval training',
-    weekStart: 1,
-    weekEnd: 16
+    weekStart: 5,
+    weekEnd: 8
   },
   { 
     id: 'mobility', 
-    name: 'Mobility', 
+    name: 'Week 9-12', 
     gid: '1344676238', // Third tab GID
     description: 'Flexibility and mobility exercises',
-    weekStart: 1,
-    weekEnd: 16
+    weekStart: 9,
+    weekEnd: 12
   }
 ];
 

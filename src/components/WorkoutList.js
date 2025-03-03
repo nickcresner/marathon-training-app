@@ -6,9 +6,9 @@ function WorkoutList({ workouts, currentPhase }) {
   // Get the current phase info from the phase ID
   const getCurrentPhaseInfo = (phaseId) => {
     const phaseInfo = {
-      strength: { name: 'Strength Training', description: 'Upper and lower body strength training workouts' },
-      conditioning: { name: 'Conditioning', description: 'Cardio conditioning and interval training' },
-      mobility: { name: 'Mobility', description: 'Flexibility and mobility exercises' }
+      strength: { name: 'Week 1-4', description: 'Upper and lower body strength training workouts' },
+      conditioning: { name: 'Week 5-8', description: 'Cardio conditioning and interval training' },
+      mobility: { name: 'Week 9-12', description: 'Flexibility and mobility exercises' }
     };
     return phaseInfo[phaseId] || { name: 'Training Phase', description: '' };
   };
