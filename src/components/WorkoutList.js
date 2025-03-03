@@ -6,10 +6,9 @@ function WorkoutList({ workouts, currentPhase }) {
   // Get the current phase info from the phase ID
   const getCurrentPhaseInfo = (phaseId) => {
     const phaseInfo = {
-      base: { name: 'Base Phase (Weeks 1-4)', description: 'Foundation phase focusing on building basic strength and form' },
-      build: { name: 'Build Phase (Weeks 5-8)', description: 'Progressive overload phase with increased intensity' },
-      peak: { name: 'Peak Phase (Weeks 9-12)', description: 'Race preparation with peak performance workouts' },
-      taper: { name: 'Taper Phase (Weeks 13-16)', description: 'Pre-race tapering to maximize race day performance' }
+      strength: { name: 'Strength Training', description: 'Upper and lower body strength training workouts' },
+      conditioning: { name: 'Conditioning', description: 'Cardio conditioning and interval training' },
+      mobility: { name: 'Mobility', description: 'Flexibility and mobility exercises' }
     };
     return phaseInfo[phaseId] || { name: 'Training Phase', description: '' };
   };

@@ -4,10 +4,9 @@ import { fetchWorkouts, TRAINING_PHASES } from '../../data/workouts';
 
 function DataImportStep({ prevStep, nextStep, sheetData }) {
   const [importStatus, setImportStatus] = useState({
-    base: { status: 'pending', count: 0 },
-    build: { status: 'pending', count: 0 },
-    peak: { status: 'pending', count: 0 },
-    taper: { status: 'pending', count: 0 }
+    strength: { status: 'pending', count: 0 },
+    conditioning: { status: 'pending', count: 0 },
+    mobility: { status: 'pending', count: 0 }
   });
   const [currentPhase, setCurrentPhase] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -23,7 +22,7 @@ function DataImportStep({ prevStep, nextStep, sheetData }) {
     setIsImporting(true);
     setError(null);
     
-    const phases = ['base', 'build', 'peak', 'taper'];
+    const phases = ['strength', 'conditioning', 'mobility'];
     let allSuccess = true;
     
     for (const phase of phases) {
