@@ -6,13 +6,16 @@ import ResetPassword from './ResetPassword';
 
 function AuthContainer({ onAuthSuccess }) {
   const [authView, setAuthView] = useState('login'); // 'login', 'register', or 'resetPassword'
+  const [justResetPassword, setJustResetPassword] = useState(false);
   
   const handleSwitchToRegister = () => {
     setAuthView('register');
+    setJustResetPassword(false);
   };
   
-  const handleSwitchToLogin = () => {
+  const handleSwitchToLogin = (fromReset = false) => {
     setAuthView('login');
+    setJustResetPassword(fromReset);
   };
   
   const handleSwitchToResetPassword = () => {
@@ -28,19 +31,20 @@ function AuthContainer({ onAuthSuccess }) {
               onLogin={onAuthSuccess} 
               onSwitchToRegister={handleSwitchToRegister}
               onSwitchToResetPassword={handleSwitchToResetPassword}
+              justResetPassword={justResetPassword}
             />
           )}
           
           {authView === 'register' && (
             <Register 
               onRegister={onAuthSuccess} 
-              onSwitchToLogin={handleSwitchToLogin} 
+              onSwitchToLogin={() => handleSwitchToLogin(false)} 
             />
           )}
           
           {authView === 'resetPassword' && (
             <ResetPassword
-              onSwitchToLogin={handleSwitchToLogin}
+              onSwitchToLogin={() => handleSwitchToLogin(true)}
             />
           )}
         </div>

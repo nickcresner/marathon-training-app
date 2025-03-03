@@ -2,15 +2,26 @@
 import React, { useState } from 'react';
 import { loginUser } from '../../services/firebaseService';
 
-function Login({ onLogin, onSwitchToRegister, onSwitchToResetPassword }) {
+function Login({ onLogin, onSwitchToRegister, onSwitchToResetPassword, justResetPassword }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Set success message if user just completed password reset
+  React.useEffect(() => {
+    if (justResetPassword) {
+      setSuccessMessage("Password reset complete! Please log in with your new password.");
+    } else {
+      setSuccessMessage(null);
+    }
+  }, [justResetPassword]);
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null);
     setIsLoading(true);
 
     // Validate inputs
@@ -31,11 +42,34 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToResetPassword }) {
       if (error.code === 'auth/user-not-found') {
         setError("No account exists with this email. Please register first.");
       } else if (error.code === 'auth/wrong-password') {
-        setError("Incorrect password. Please try again.");
+        // Special message for potentially recent password reset
+        setError(
+          <>
+            <strong>Incorrect password.</strong> 
+            {" "}If you recently reset your password, please make sure you're using your new password. 
+            {" "}<button 
+              className="btn btn-link p-0 text-decoration-underline"
+              onClick={onSwitchToResetPassword}
+            >
+              Reset password again
+            </button>
+          </>
+        );
       } else if (error.code === 'auth/invalid-credential') {
-        setError("Invalid login credentials. Please check your email and password.");
+        setError(
+          <>
+            <strong>Invalid login credentials.</strong> 
+            {" "}Please verify your email and password are correct. If you forgot your password, you can 
+            {" "}<button 
+              className="btn btn-link p-0 text-decoration-underline"
+              onClick={onSwitchToResetPassword}
+            >
+              reset it here
+            </button>
+          </>
+        );
       } else if (error.code === 'auth/too-many-requests') {
-        setError("Too many failed login attempts. Please try again later.");
+        setError("Too many failed login attempts. Please try again later or reset your password.");
       } else if (error.code === 'auth/configuration-not-found') {
         setError("Authentication service is not configured properly. Please contact support.");
       } else {
@@ -60,9 +94,17 @@ function Login({ onLogin, onSwitchToRegister, onSwitchToResetPassword }) {
             style={{ maxWidth: '150px' }}
           />
         </div>
+        
         {error && (
           <div className="alert alert-danger" role="alert">
             {error}
+          </div>
+        )}
+        
+        {successMessage && (
+          <div className="alert alert-success" role="alert">
+            <i className="bi bi-check-circle-fill me-2"></i>
+            {successMessage}
           </div>
         )}
         <form onSubmit={handleSubmit}>

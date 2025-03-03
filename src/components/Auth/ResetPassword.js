@@ -68,8 +68,16 @@ function ResetPassword({ onSwitchToLogin }) {
         
         {success && (
           <div className="alert alert-success" role="alert">
-            <p>Password reset email sent! Please check your inbox.</p>
-            <p className="mb-0">If you don't see it, please check your spam folder.</p>
+            <h5 className="alert-heading"><i className="bi bi-check-circle me-2"></i>Reset Email Sent!</h5>
+            <p>Check your inbox for a password reset link. Follow these steps:</p>
+            <ol className="mb-0">
+              <li>Open the email from Pinnacle Marathon Training</li>
+              <li>Click the reset link in the email</li>
+              <li>Create a new password when prompted</li>
+              <li>Return here to log in with your new password</li>
+            </ol>
+            <hr/>
+            <p className="mb-0 small"><strong>Note:</strong> If you don't see the email, check your spam folder or request another reset.</p>
           </div>
         )}
         
