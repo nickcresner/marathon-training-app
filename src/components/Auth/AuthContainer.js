@@ -2,31 +2,45 @@
 import React, { useState } from 'react';
 import Login from './Login';
 import Register from './Register';
+import ResetPassword from './ResetPassword';
 
 function AuthContainer({ onAuthSuccess }) {
-  const [showLogin, setShowLogin] = useState(true);
+  const [authView, setAuthView] = useState('login'); // 'login', 'register', or 'resetPassword'
   
   const handleSwitchToRegister = () => {
-    setShowLogin(false);
+    setAuthView('register');
   };
   
   const handleSwitchToLogin = () => {
-    setShowLogin(true);
+    setAuthView('login');
+  };
+  
+  const handleSwitchToResetPassword = () => {
+    setAuthView('resetPassword');
   };
   
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          {showLogin ? (
+          {authView === 'login' && (
             <Login 
               onLogin={onAuthSuccess} 
-              onSwitchToRegister={handleSwitchToRegister} 
+              onSwitchToRegister={handleSwitchToRegister}
+              onSwitchToResetPassword={handleSwitchToResetPassword}
             />
-          ) : (
+          )}
+          
+          {authView === 'register' && (
             <Register 
               onRegister={onAuthSuccess} 
               onSwitchToLogin={handleSwitchToLogin} 
+            />
+          )}
+          
+          {authView === 'resetPassword' && (
+            <ResetPassword
+              onSwitchToLogin={handleSwitchToLogin}
             />
           )}
         </div>

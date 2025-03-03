@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { loginUser } from '../../services/firebaseService';
 
-function Login({ onLogin, onSwitchToRegister }) {
+function Login({ onLogin, onSwitchToRegister, onSwitchToResetPassword }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -87,6 +87,15 @@ function Login({ onLogin, onSwitchToRegister }) {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <div className="text-end mt-1">
+              <button 
+                type="button" 
+                className="btn btn-link p-0 text-decoration-none small"
+                onClick={onSwitchToResetPassword}
+              >
+                Forgot Password?
+              </button>
+            </div>
           </div>
           <button
             type="submit"

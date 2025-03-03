@@ -16,6 +16,7 @@ import {
   onAuthStateChanged, 
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut 
 } from 'firebase/auth';
 import Papa from 'papaparse';
@@ -71,6 +72,18 @@ export const getCurrentUser = () => {
       resolve(user);
     }, reject);
   });
+};
+
+export const resetPassword = async (email) => {
+  try {
+    console.log("Sending password reset email to:", email);
+    await sendPasswordResetEmail(auth, email);
+    console.log("Password reset email sent successfully");
+    return true;
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    throw error;
+  }
 };
 
 // User data functions
