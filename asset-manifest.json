@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/marathon-training-app/static/css/main.9231e01c.css",
-    "main.js": "/marathon-training-app/static/js/main.8476abc6.js",
+    "main.js": "/marathon-training-app/static/js/main.d17ad3bc.js",
     "static/js/225.79d52734.chunk.js": "/marathon-training-app/static/js/225.79d52734.chunk.js",
     "static/js/453.19dce434.chunk.js": "/marathon-training-app/static/js/453.19dce434.chunk.js",
     "index.html": "/marathon-training-app/index.html",
     "main.9231e01c.css.map": "/marathon-training-app/static/css/main.9231e01c.css.map",
-    "main.8476abc6.js.map": "/marathon-training-app/static/js/main.8476abc6.js.map",
+    "main.d17ad3bc.js.map": "/marathon-training-app/static/js/main.d17ad3bc.js.map",
     "225.79d52734.chunk.js.map": "/marathon-training-app/static/js/225.79d52734.chunk.js.map",
     "453.19dce434.chunk.js.map": "/marathon-training-app/static/js/453.19dce434.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9231e01c.css",
-    "static/js/main.8476abc6.js"
+    "static/js/main.d17ad3bc.js"
   ]
 }
