@@ -147,8 +147,20 @@ export async function fetchWorkouts(phaseId = 'base', userSheetUrl = null) {
       console.log("Sample row values:", Object.values(parseResult.data[0]));
     }
     
-    // Process the data into workout format
-    const processedWorkouts = processWorkoutData(parseResult.data, selectedPhase.id);
+    // Process the data into workout format using the new CSV parser
+    // Import the CSV parser utility
+    const { parseAndNormalizeCSV, extractHistoryData } = await import('../utils/csvParser');
+    
+    // Normalize the CSV data
+    const normalizedData = parseAndNormalizeCSV(csvData);
+    console.log("Normalized data rows:", normalizedData.length);
+    
+    // Extract exercise history from the spreadsheet
+    const historyData = extractHistoryData(normalizedData);
+    console.log("Extracted history for exercises:", Object.keys(historyData).length);
+    
+    // Process the normalized data into workout format
+    const processedWorkouts = processWorkoutData(normalizedData, selectedPhase.id, historyData);
     console.log("Processed workouts:", processedWorkouts.length);
     
     // If no workouts were processed, use test data
@@ -404,7 +416,7 @@ function getRandomExercise(phaseId, index) {
   return exercises[index % exercises.length];
 }
 
-function processWorkoutData(rows, phaseId) {
+function processWorkoutData(rows, phaseId, historyData = {}) {
   const workouts = [];
   let currentWorkout = null;
   let workoutId = 1;
@@ -416,6 +428,9 @@ function processWorkoutData(rows, phaseId) {
   if (phaseInfo) {
     currentWeek = phaseInfo.weekStart;
   }
+  
+  // Used to track exercises for history mapping
+  const exerciseMap = {};
   
   // When using the same CSV for all phases, adapt week numbers to the current phase
   const adjustWeekForPhase = (weekNumber) => {
@@ -561,6 +576,9 @@ function processWorkoutData(rows, phaseId) {
       const weekToUse = adjustWeekForPhase(currentWeek);
       const exerciseId = `${phaseId}-week${weekToUse}-day${currentWorkout.dayNumber}-ex${currentWorkout.exercises.length + 1}`;
       
+      // Store reference to this exercise for history mapping
+      exerciseMap[`exercise-${rowIndex}`] = exerciseId;
+      
       // Check if this is a warmup header
       if (firstCol && (firstCol.toLowerCase().includes('primers') || firstCol.toLowerCase().includes('switch'))) {
         // Set the current warmup type for subsequent exercises
@@ -604,6 +622,20 @@ function processWorkoutData(rows, phaseId) {
       // Determine if this is a warmup exercise
       const isWarmupExercise = currentWarmupType !== null;
       
+      // Get any historical data for this exercise
+      const exerciseKey = `exercise-${rowIndex}`;
+      const exerciseHistory = historyData[exerciseKey] || [];
+      
+      // Format history data for the frontend
+      const formattedHistory = exerciseHistory.map(entry => ({
+        date: entry.date,
+        actualLoad: entry.value,
+        actualSets: '',
+        actualReps: '',
+        notes: '',
+        fromApp: false // Mark that this data comes from the Google Sheet
+      }));
+      
       const exercise = {
         id: exerciseId,
         name: exerciseName,
@@ -614,7 +646,7 @@ function processWorkoutData(rows, phaseId) {
         rest: columnValues[6] || '',
         notes: columnValues[7] || '',
         videoUrl: videoUrl,
-        history: [], // Will store user's exercise history
+        history: formattedHistory, // Include historical data from the sheet
         supersetId: supersetId,
         supersetOrder: supersetOrder,
         isPartOfSuperset: isPartOfSuperset,

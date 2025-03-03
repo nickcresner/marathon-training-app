@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import YouTube from 'react-youtube';
 import { findExerciseVideo } from '../services/youtubeService';
+import ExerciseHistory from './History/ExerciseHistory';
 
 function ExerciseDetail({ workouts, updateExerciseHistory }) {
   const { workoutId, exerciseId } = useParams();
@@ -19,6 +20,9 @@ function ExerciseDetail({ workouts, updateExerciseHistory }) {
     actualLoad: '',
     notes: ''
   });
+  
+  // State for display mode
+  const [showHistoryFromSheet, setShowHistoryFromSheet] = useState(true);
   
   // State for YouTube video ID and embed code
   const [videoData, setVideoData] = useState({ videoId: null, embedCode: null });
@@ -171,7 +175,8 @@ function ExerciseDetail({ workouts, updateExerciseHistory }) {
       sets: formData.actualSets,
       reps: formData.actualReps,
       load: formData.actualLoad,
-      notes: formData.notes
+      notes: formData.notes,
+      fromApp: true // Mark this entry as coming from the app, not the sheet
     };
     
     // Add to exercise history
@@ -521,6 +526,24 @@ function ExerciseDetail({ workouts, updateExerciseHistory }) {
           {/* Exercise History */}
           <div className="mt-5">
             <h4>Exercise History</h4>
+            <div className="mb-3">
+              <div className="form-check form-switch">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="showSheetHistory"
+                  checked={showHistoryFromSheet}
+                  onChange={(e) => setShowHistoryFromSheet(e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor="showSheetHistory">
+                  Include data from Google Sheet
+                </label>
+              </div>
+              <small className="text-muted">
+                Toggle to see your Google Sheet history or just your tracked progress in the app
+              </small>
+            </div>
+            
             {exercise.history && exercise.history.length > 0 ? (
               <div className="table-responsive">
                 <table className="table table-striped">
@@ -531,26 +554,37 @@ function ExerciseDetail({ workouts, updateExerciseHistory }) {
                       <th>Reps</th>
                       <th>Load</th>
                       <th>Notes</th>
-                      <th>Action</th>
+                      <th>Source</th>
+                      {!showHistoryFromSheet && <th>Action</th>}
                     </tr>
                   </thead>
                   <tbody>
-                    {exercise.history.sort((a, b) => new Date(b.date) - new Date(a.date)).map(entry => (
-                      <tr key={entry.id}>
-                        <td>{new Date(entry.date).toLocaleDateString()}</td>
-                        <td>{entry.sets}</td>
-                        <td>{entry.reps}</td>
-                        <td>{entry.load}</td>
-                        <td>{entry.notes}</td>
-                        <td>
-                          <button 
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={() => handleDeleteHistory(entry.id)}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
+                    {exercise.history
+                      .filter(entry => showHistoryFromSheet || entry.fromApp)
+                      .sort((a, b) => new Date(b.date) - new Date(a.date))
+                      .map((entry, index) => (
+                        <tr key={`history-${index}`}>
+                          <td>{new Date(entry.date).toLocaleDateString()}</td>
+                          <td>{entry.actualSets || entry.sets || '-'}</td>
+                          <td>{entry.actualReps || entry.reps || '-'}</td>
+                          <td className="fw-bold">{entry.actualLoad || entry.load || '-'}</td>
+                          <td>{entry.notes || '-'}</td>
+                          <td>
+                            <span className={`badge ${entry.fromApp ? 'bg-primary' : 'bg-secondary'}`}>
+                              {entry.fromApp ? 'App' : 'Sheet'}
+                            </span>
+                          </td>
+                          {!showHistoryFromSheet && entry.fromApp && (
+                            <td>
+                              <button 
+                                className="btn btn-sm btn-outline-danger"
+                                onClick={() => handleDeleteHistory(entry.id)}
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          )}
+                        </tr>
                     ))}
                   </tbody>
                 </table>
