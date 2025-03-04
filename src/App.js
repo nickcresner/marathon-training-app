@@ -4,6 +4,27 @@ import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-route
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
+// Firebase
+import { getCurrentUser, getUserProfile } from './services/firebaseService';
+
+// Components
+import LoadingAnimation from './components/LoadingAnimation';
+import Navigation from './components/Layout/Navigation';
+import WorkoutList from './components/WorkoutList';
+import WorkoutDetail from './components/WorkoutDetail';
+import BlockSelection from './components/BlockSelection';
+import ExerciseDetail from './components/ExerciseDetail';
+import CustomWorkout from './components/CustomWorkout';
+import DemoMode from './components/DemoMode';
+import AuthContainer from './components/Auth/AuthContainer';
+import UserSettings from './components/Settings/UserSettings';
+import HelpCenter from './components/Help/HelpCenter';
+import OnboardingContainer from './components/Onboarding/OnboardingContainer';
+
+// Import data fetching service
+import { fetchWorkouts, TRAINING_PHASES, groupWeeksIntoBlocks } from './data/workouts';
+import { getGoogleSheetSettings } from './services/firebaseService';
+
 // Add global polyfill for YouTube iframe API fallback
 if (typeof window !== 'undefined') {
   window.onYouTubeIframeAPIReady = function() {
@@ -12,23 +33,10 @@ if (typeof window !== 'undefined') {
   };
 }
 
-// Firebase
-import { getCurrentUser, getUserProfile } from './services/firebaseService';
+// For Admin and Coach components, we'll implement lazy loading later
+// Commenting out imports that aren't yet implemented to fix build
 
-// Components
-import LoadingAnimation from './components/LoadingAnimation';
-
-// Layout Components
-import Navigation from './components/Layout/Navigation';
-
-// Main App Components
-import WorkoutList from './components/WorkoutList';
-import WorkoutDetail from './components/WorkoutDetail';
-import BlockSelection from './components/BlockSelection';
-import ExerciseDetail from './components/ExerciseDetail';
-import CustomWorkout from './components/CustomWorkout';
-import DemoMode from './components/DemoMode';
-
+/*
 // Admin Components
 import AdminDashboard from './components/Admin/AdminDashboard';
 import UserManagement from './components/Admin/UserManagement';
@@ -42,20 +50,8 @@ import CoachExerciseManager from './components/Coach/CoachExerciseManager';
 import CoachWorkoutManager from './components/Coach/CoachWorkoutManager';
 import CoachClientManager from './components/Coach/CoachClientManager';
 import CoachMessaging from './components/Coach/CoachMessaging';
+*/
 
-// Auth Components
-import AuthContainer from './components/Auth/AuthContainer';
-
-// Settings and Help Components
-import UserSettings from './components/Settings/UserSettings';
-import HelpCenter from './components/Help/HelpCenter';
-
-// Onboarding Components
-import OnboardingContainer from './components/Onboarding/OnboardingContainer';
-
-// Import data fetching service
-import { fetchWorkouts, TRAINING_PHASES, groupWeeksIntoBlocks } from './data/workouts';
-import { getGoogleSheetSettings } from './services/firebaseService';
 
 // Debug flag to force show loading animation - set to false by default
 window.SHOW_LOADING_ANIMATION = false;
@@ -140,8 +136,22 @@ function App() {
         // Fetch workout data for the current phase
         const data = await fetchWorkouts(currentPhase, userSheetUrl);
         
+        // Get custom workouts from localStorage
+        const customWorkouts = JSON.parse(localStorage.getItem('customWorkouts') || '[]');
+        
+        // Combine regular workouts with custom workouts
+        let allWorkouts = [...data];
+        
+        // Add custom workouts if we're on custom phase or all phases
+        if (currentPhase === 'custom' || currentPhase === 'all') {
+          allWorkouts = [...allWorkouts, ...customWorkouts];
+        }
+        
         // If we're using test data, ensure the week numbers align with the correct phase
-        const processedData = data.map(workout => {
+        const processedData = allWorkouts.map(workout => {
+          // Skip custom workouts as they don't need week adjustment
+          if (workout.phase === 'custom') return workout;
+          
           // If the workout doesn't already have a week assigned from the phase range
           if (workout.week < currentPhaseInfo.weekStart || workout.week > currentPhaseInfo.weekEnd) {
             // Adjust the week to fit within the phase's range
@@ -376,6 +386,10 @@ function App() {
             path="/custom-workout" 
             element={<CustomWorkout />} 
           />
+          <Route
+            path="/custom-workout/:workoutId"
+            element={<WorkoutDetail workouts={workouts} currentPhase="custom" />}
+          />
           
           {/* Demo Mode */}
           <Route 
@@ -415,87 +429,57 @@ function App() {
             element={<HelpCenter />} 
           />
           
-          {/* Admin Routes */}
+          {/* Admin Routes - Temporarily disabled until they're fully implemented
           <Route 
             path="/admin" 
             element={
               <AdminRoute>
-                <AdminDashboard user={user} />
+                <div className="alert alert-info">Admin dashboard coming soon.</div>
               </AdminRoute>
             } 
           />
+          */}
+          
+          {/* Temporary admin route placeholder */}
           <Route 
-            path="/admin/users" 
+            path="/admin" 
             element={
-              <AdminRoute>
-                <UserManagement />
-              </AdminRoute>
-            } 
-          />
-          <Route 
-            path="/admin/exercises" 
-            element={
-              <AdminRoute>
-                <AdminExerciseManager />
-              </AdminRoute>
-            } 
-          />
-          <Route 
-            path="/admin/workouts" 
-            element={
-              <AdminRoute>
-                <AdminWorkoutManager />
-              </AdminRoute>
-            } 
-          />
-          <Route 
-            path="/admin/logs" 
-            element={
-              <AdminRoute>
-                <AdminLogs />
-              </AdminRoute>
+              user && userRole === 'admin' ? (
+                <div className="alert alert-info p-5 text-center">
+                  <h2>Admin Dashboard</h2>
+                  <p>Admin features are coming soon in the next update.</p>
+                  <Link to="/" className="btn btn-primary mt-3">Return to Workouts</Link>
+                </div>
+              ) : (
+                <Navigate to="/login" />
+              )
             } 
           />
           
-          {/* Coach Routes */}
+          {/* Coach Routes - Temporarily disabled until they're fully implemented
           <Route 
             path="/coach" 
             element={
               <CoachRoute>
-                <CoachDashboard user={user} />
+                <div className="alert alert-info">Coach dashboard coming soon.</div>
               </CoachRoute>
             } 
           />
+          */}
+          
+          {/* Temporary coach route placeholder */}
           <Route 
-            path="/coach/exercises" 
+            path="/coach" 
             element={
-              <CoachRoute>
-                <CoachExerciseManager />
-              </CoachRoute>
-            } 
-          />
-          <Route 
-            path="/coach/workouts" 
-            element={
-              <CoachRoute>
-                <CoachWorkoutManager />
-              </CoachRoute>
-            } 
-          />
-          <Route 
-            path="/coach/clients" 
-            element={
-              <CoachRoute>
-                <CoachClientManager user={user} />
-              </CoachRoute>
-            } 
-          />
-          <Route 
-            path="/coach/messages/:clientId?" 
-            element={
-              <CoachRoute>
-                <CoachMessaging user={user} />
-              </CoachRoute>
+              user && userRole === 'coach' ? (
+                <div className="alert alert-info p-5 text-center">
+                  <h2>Coach Dashboard</h2>
+                  <p>Coach features are coming soon in the next update.</p>
+                  <Link to="/" className="btn btn-primary mt-3">Return to Workouts</Link>
+                </div>
+              ) : (
+                <Navigate to="/login" />
+              )
             } 
           />
         </Routes>

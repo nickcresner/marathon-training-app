@@ -12,7 +12,18 @@ function WorkoutDetail({ workouts, currentPhase }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 576);
   
   useEffect(() => {
-    const foundWorkout = workouts.find(w => w.id === workoutId);
+    // Check if workoutId includes "custom-" prefix for custom workouts
+    let foundWorkout;
+    
+    if (workoutId.startsWith('custom-')) {
+      // This is a custom workout from localStorage
+      const customWorkouts = JSON.parse(localStorage.getItem('customWorkouts') || '[]');
+      foundWorkout = customWorkouts.find(w => w.id === workoutId);
+    } else {
+      // Regular workout from the main workouts array
+      foundWorkout = workouts.find(w => w.id === workoutId);
+    }
+    
     setWorkout(foundWorkout);
     
     // Check if workout is completed from localStorage
