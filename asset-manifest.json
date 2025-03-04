@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/marathon-training-app/static/css/main.59925b59.css",
-    "main.js": "/marathon-training-app/static/js/main.78029330.js",
+    "main.css": "/marathon-training-app/static/css/main.e539c92f.css",
+    "main.js": "/marathon-training-app/static/js/main.5468c037.js",
     "static/js/225.79d52734.chunk.js": "/marathon-training-app/static/js/225.79d52734.chunk.js",
     "static/js/453.19dce434.chunk.js": "/marathon-training-app/static/js/453.19dce434.chunk.js",
     "index.html": "/marathon-training-app/index.html",
     "static/media/black-runner.svg": "/marathon-training-app/static/media/black-runner.1ed29f0a5d3ebd24bffb.svg",
-    "main.59925b59.css.map": "/marathon-training-app/static/css/main.59925b59.css.map",
-    "main.78029330.js.map": "/marathon-training-app/static/js/main.78029330.js.map",
+    "main.e539c92f.css.map": "/marathon-training-app/static/css/main.e539c92f.css.map",
+    "main.5468c037.js.map": "/marathon-training-app/static/js/main.5468c037.js.map",
     "225.79d52734.chunk.js.map": "/marathon-training-app/static/js/225.79d52734.chunk.js.map",
     "453.19dce434.chunk.js.map": "/marathon-training-app/static/js/453.19dce434.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.59925b59.css",
-    "static/js/main.78029330.js"
+    "static/css/main.e539c92f.css",
+    "static/js/main.5468c037.js"
   ]
 }
