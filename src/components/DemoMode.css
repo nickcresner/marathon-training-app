@@ -1,0 +1,611 @@
+/* DemoMode.css */
+
+/* General styles */
+.demo-mode-container {
+  overflow-x: hidden;
+}
+
+.section-title {
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.highlight {
+  color: #0d6efd;
+  position: relative;
+  display: inline-block;
+}
+
+.highlight::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #0d6efd;
+  border-radius: 3px;
+}
+
+/* Demo tip banner */
+.demo-tip-banner {
+  background-color: rgba(13, 110, 253, 0.1);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border-left: 4px solid #0d6efd;
+}
+
+.demo-tip-content {
+  display: flex;
+  align-items: center;
+}
+
+.demo-tip-text {
+  animation: fadeInOut 6s infinite;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Hero section */
+.demo-hero {
+  background: linear-gradient(135deg, #0062E6 0%, #33AEFF 100%);
+  color: white;
+  padding: 5rem 0;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.demo-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../images/logos/black-runner.svg');
+  background-repeat: no-repeat;
+  background-position: 105% 50%;
+  background-size: 40%;
+  opacity: 0.05;
+}
+
+.demo-hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  animation: slideIn 0.8s ease-out;
+}
+
+.demo-hero-subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  animation: slideIn 0.8s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.hero-buttons {
+  animation: slideIn 0.8s ease-out 0.4s forwards;
+  opacity: 0;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.demo-hero-image {
+  animation: fadeIn 1s ease-out 0.6s forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Phase selector */
+.phase-selector-container {
+  margin-bottom: 3rem;
+}
+
+.phase-selector {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.phase-btn {
+  background: white;
+  border: 2px solid transparent;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.phase-btn i {
+  font-size: 1.2rem;
+}
+
+.phase-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.phase-btn.active {
+  border-color: #0d6efd;
+  color: #0d6efd;
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+/* Featured workouts section */
+.featured-workouts-section {
+  margin-bottom: 4rem;
+  padding: 1rem 0;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.workout-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  height: 100%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.workout-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.workout-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.workout-card:hover::before {
+  background-color: #0d6efd;
+}
+
+.workout-card.active {
+  border: 2px solid #0d6efd;
+}
+
+.workout-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.workout-type, .workout-difficulty {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.workout-type.strength {
+  background-color: #e3f2fd;
+  color: #0d6efd;
+}
+
+.workout-type.mobility {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.workout-type.power {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.workout-type.endurance {
+  background-color: #f3e5f5;
+  color: #9c27b0;
+}
+
+.workout-difficulty {
+  background-color: #f5f5f5;
+  color: #616161;
+}
+
+.workout-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+}
+
+.workout-meta {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.workout-meta i {
+  margin-right: 0.3rem;
+}
+
+.workout-desc {
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.view-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #0d6efd;
+  font-weight: 600;
+  margin-top: auto;
+}
+
+.view-details i {
+  transition: transform 0.3s ease;
+}
+
+.workout-card:hover .view-details i {
+  transform: translateX(5px);
+}
+
+.animate-in {
+  animation: fadeIn 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+/* Workout detail section */
+.workout-detail-section {
+  margin-bottom: 4rem;
+  padding: 2rem 0;
+  background-color: #f8f9fa;
+}
+
+.workout-detail-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+}
+
+.workout-detail-header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 1.5rem;
+}
+
+.workout-detail-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.workout-tags {
+  display: flex;
+  gap: 1rem;
+}
+
+.workout-tag {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.workout-tag.strength, .workout-tag.power, 
+.workout-tag.mobility, .workout-tag.endurance {
+  background-color: #e3f2fd;
+  color: #0d6efd;
+}
+
+.workout-tag.difficulty {
+  background-color: #f5f5f5;
+  color: #616161;
+}
+
+.workout-tag.duration {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.workout-exercises {
+  margin-bottom: 2rem;
+}
+
+.exercises-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.exercise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.exercise-item {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border-left: 4px solid #0d6efd;
+}
+
+.exercise-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.exercise-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.exercise-number {
+  width: 30px;
+  height: 30px;
+  background-color: #0d6efd;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-right: 1rem;
+}
+
+.exercise-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 1rem 0 0;
+}
+
+.exercise-tags {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.exercise-tag {
+  padding: 0.2rem 0.6rem;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.exercise-tag.target {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.exercise-tag.equipment {
+  background-color: #f3e5f5;
+  color: #9c27b0;
+}
+
+.exercise-details {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 0.3rem;
+}
+
+.detail-value {
+  font-weight: 600;
+}
+
+.exercise-notes {
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.exercise-video {
+  margin-top: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background-color: #f8f9fa;
+  padding: 15px;
+}
+
+.exercise-video .ratio {
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.exercise-video iframe {
+  border: none;
+}
+
+.video-link {
+  color: #0d6efd;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.video-link:hover {
+  text-decoration: underline;
+}
+
+.workout-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Features section */
+.features-section {
+  padding: 4rem 0;
+  background-color: white;
+  margin-bottom: 4rem;
+}
+
+.features-grid {
+  margin-top: 3rem;
+}
+
+.feature-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  height: 100%;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  width: 70px;
+  height: 70px;
+  background-color: rgba(13, 110, 253, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.feature-icon i {
+  font-size: 2rem;
+  color: #0d6efd;
+}
+
+.feature-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.feature-desc {
+  color: #6c757d;
+}
+
+/* CTA section */
+.cta-section {
+  background: linear-gradient(135deg, #0062E6 0%, #33AEFF 100%);
+  color: white;
+  padding: 4rem 0;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.cta-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.cta-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .demo-hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .demo-hero-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .phase-selector {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .exercise-details {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .workout-detail-title {
+    font-size: 1.5rem;
+  }
+  
+  .cta-title {
+    font-size: 2rem;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .feature-card {
+    margin-bottom: 1rem;
+  }
+}

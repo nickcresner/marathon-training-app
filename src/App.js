@@ -4,8 +4,19 @@ import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-route
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
+// Add global polyfill for YouTube iframe API fallback
+if (typeof window !== 'undefined') {
+  window.onYouTubeIframeAPIReady = function() {
+    console.log('YouTube iframe API ready');
+    // This globally accessible function helps with YouTube iframe API issues
+  };
+}
+
 // Firebase
-import { getCurrentUser } from './services/firebaseService';
+import { getCurrentUser, getUserProfile } from './services/firebaseService';
+
+// Components
+import LoadingAnimation from './components/LoadingAnimation';
 
 // Layout Components
 import Navigation from './components/Layout/Navigation';
@@ -15,6 +26,22 @@ import WorkoutList from './components/WorkoutList';
 import WorkoutDetail from './components/WorkoutDetail';
 import BlockSelection from './components/BlockSelection';
 import ExerciseDetail from './components/ExerciseDetail';
+import CustomWorkout from './components/CustomWorkout';
+import DemoMode from './components/DemoMode';
+
+// Admin Components
+import AdminDashboard from './components/Admin/AdminDashboard';
+import UserManagement from './components/Admin/UserManagement';
+import AdminExerciseManager from './components/Admin/AdminExerciseManager';
+import AdminWorkoutManager from './components/Admin/AdminWorkoutManager';
+import AdminLogs from './components/Admin/AdminLogs';
+
+// Coach Components
+import CoachDashboard from './components/Coach/CoachDashboard';
+import CoachExerciseManager from './components/Coach/CoachExerciseManager';
+import CoachWorkoutManager from './components/Coach/CoachWorkoutManager';
+import CoachClientManager from './components/Coach/CoachClientManager';
+import CoachMessaging from './components/Coach/CoachMessaging';
 
 // Auth Components
 import AuthContainer from './components/Auth/AuthContainer';
@@ -30,6 +57,9 @@ import OnboardingContainer from './components/Onboarding/OnboardingContainer';
 import { fetchWorkouts, TRAINING_PHASES, groupWeeksIntoBlocks } from './data/workouts';
 import { getGoogleSheetSettings } from './services/firebaseService';
 
+// Debug flag to force show loading animation - set to false by default
+window.SHOW_LOADING_ANIMATION = false;
+
 function App() {
   const [workouts, setWorkouts] = useState([]);
   const [currentPhase, setCurrentPhase] = useState('base');
@@ -40,6 +70,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [userRole, setUserRole] = useState('user'); // 'user', 'coach', or 'admin'
   
   // Check if user is logged in
   useEffect(() => {
@@ -48,9 +79,16 @@ function App() {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
         
-        // Check if user needs onboarding
+        // Check if user needs onboarding and get user role
         if (currentUser) {
           await checkUserOnboardingStatus(currentUser.uid);
+          
+          // Get user profile data including role
+          const userProfile = await getUserProfile(currentUser.uid);
+          if (userProfile && userProfile.role) {
+            setUserRole(userProfile.role);
+            console.log(`User role: ${userProfile.role}`);
+          }
         }
       } catch (error) {
         console.error("Auth check error:", error);
@@ -149,10 +187,21 @@ function App() {
   };
   
   // Handle user authentication
-  const handleAuthSuccess = (user) => {
+  const handleAuthSuccess = async (user) => {
     setUser(user);
+    
     // Check if the user needs onboarding
-    checkUserOnboardingStatus(user.uid);
+    await checkUserOnboardingStatus(user.uid);
+    
+    // Get user role
+    try {
+      const userProfile = await getUserProfile(user.uid);
+      if (userProfile && userProfile.role) {
+        setUserRole(userProfile.role);
+      }
+    } catch (error) {
+      console.error("Error getting user role:", error);
+    }
     
     // Add console log to track authentication flow
     console.log("Authentication successful, user set:", user.email);
@@ -161,6 +210,7 @@ function App() {
   const handleLogout = () => {
     setUser(null);
     setNeedsOnboarding(false);
+    setUserRole('user');  // Reset to default role
   };
   
   // Check if user needs onboarding
@@ -199,7 +249,41 @@ function App() {
     }
     
     if (!user) {
-      return <Navigate to="/login" />;
+      return <Navigate to="/demo" />;
+    }
+    
+    return children;
+  };
+  
+  // Admin-only route protection
+  const AdminRoute = ({ children }) => {
+    if (!authChecked) {
+      return <div className="container mt-5 text-center">Checking authentication...</div>;
+    }
+    
+    if (!user) {
+      return <Navigate to="/demo" />;
+    }
+    
+    if (userRole !== 'admin') {
+      return <Navigate to="/" />;
+    }
+    
+    return children;
+  };
+  
+  // Coach or Admin route protection
+  const CoachRoute = ({ children }) => {
+    if (!authChecked) {
+      return <div className="container mt-5 text-center">Checking authentication...</div>;
+    }
+    
+    if (!user) {
+      return <Navigate to="/demo" />;
+    }
+    
+    if (userRole !== 'coach' && userRole !== 'admin') {
+      return <Navigate to="/" />;
     }
     
     return children;
@@ -209,11 +293,12 @@ function App() {
     return <div className="container mt-5 text-center">Initializing app...</div>;
   }
   
-  if (isLoading) {
+  // Use the debug flag to force show the loading animation
+  if (isLoading || window.SHOW_LOADING_ANIMATION) {
     return (
       <Router>
         <Navigation user={user} onLogout={handleLogout} />
-        <div className="container mt-5 text-center">Loading workouts...</div>
+        <LoadingAnimation />
       </Router>
     );
   }
@@ -237,8 +322,14 @@ function App() {
           <Route 
             path="/" 
             element={
-              needsOnboarding && user ? (
+              user === null ? (
+                <Navigate to="/demo" />
+              ) : needsOnboarding ? (
                 <Navigate to="/onboarding" />
+              ) : userRole === 'admin' ? (
+                <Navigate to="/admin" />
+              ) : userRole === 'coach' ? (
+                <Navigate to="/coach" />
               ) : (
                 <BlockSelection 
                   weeks={weeks} 
@@ -280,6 +371,18 @@ function App() {
             } 
           />
           
+          {/* Custom Workout Creator */}
+          <Route 
+            path="/custom-workout" 
+            element={<CustomWorkout />} 
+          />
+          
+          {/* Demo Mode */}
+          <Route 
+            path="/demo" 
+            element={<DemoMode />} 
+          />
+          
           {/* Authentication Routes */}
           <Route 
             path="/login" 
@@ -311,6 +414,90 @@ function App() {
             path="/help" 
             element={<HelpCenter />} 
           />
+          
+          {/* Admin Routes */}
+          <Route 
+            path="/admin" 
+            element={
+              <AdminRoute>
+                <AdminDashboard user={user} />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/users" 
+            element={
+              <AdminRoute>
+                <UserManagement />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/exercises" 
+            element={
+              <AdminRoute>
+                <AdminExerciseManager />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/workouts" 
+            element={
+              <AdminRoute>
+                <AdminWorkoutManager />
+              </AdminRoute>
+            } 
+          />
+          <Route 
+            path="/admin/logs" 
+            element={
+              <AdminRoute>
+                <AdminLogs />
+              </AdminRoute>
+            } 
+          />
+          
+          {/* Coach Routes */}
+          <Route 
+            path="/coach" 
+            element={
+              <CoachRoute>
+                <CoachDashboard user={user} />
+              </CoachRoute>
+            } 
+          />
+          <Route 
+            path="/coach/exercises" 
+            element={
+              <CoachRoute>
+                <CoachExerciseManager />
+              </CoachRoute>
+            } 
+          />
+          <Route 
+            path="/coach/workouts" 
+            element={
+              <CoachRoute>
+                <CoachWorkoutManager />
+              </CoachRoute>
+            } 
+          />
+          <Route 
+            path="/coach/clients" 
+            element={
+              <CoachRoute>
+                <CoachClientManager user={user} />
+              </CoachRoute>
+            } 
+          />
+          <Route 
+            path="/coach/messages/:clientId?" 
+            element={
+              <CoachRoute>
+                <CoachMessaging user={user} />
+              </CoachRoute>
+            } 
+          />
         </Routes>
         
         {/* App Footer */}
@@ -334,7 +521,7 @@ function App() {
           </div>
           {!user && (
             <p className="small">
-              <Link to="/login" className="text-primary">Login</Link> to link your own Google Sheet and save your progress
+              <Link to="/login" className="text-primary">Login</Link> to link your own Google Sheet and save your progress or try our <Link to="/demo" className="text-primary">Demo Mode</Link>
             </p>
           )}
         </footer>

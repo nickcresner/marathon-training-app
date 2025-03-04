@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import YouTube from 'react-youtube';
-import { findExerciseVideo } from '../services/youtubeService';
+import { findExerciseVideo, getCoachNotes } from '../services/youtubeService';
 import ExerciseHistory from './History/ExerciseHistory';
 
 function ExerciseDetail({ workouts, updateExerciseHistory }) {
@@ -397,38 +397,129 @@ function ExerciseDetail({ workouts, updateExerciseHistory }) {
                 </div>
               ) : videoData.embedCode ? (
                 <div className="mb-4">
-                  <h4>Demonstration Video</h4>
-                  <div className="ratio ratio-16x9">
-                    {/* Direct YouTube embed using react-youtube */}
-                    {videoData.videoId && (
-                      <YouTube 
-                        videoId={videoData.videoId} 
-                        opts={{
-                          playerVars: {
-                            rel: 0,
-                          },
-                        }} 
+                  <h4>Exercise Technique Guide</h4>
+                  
+                  {/* Thumbnail preview */}
+                  {videoData.thumbnailUrl && (
+                    <div className="exercise-thumbnail-container mb-3">
+                      <img 
+                        src={videoData.thumbnailUrl} 
+                        alt={`${exercise.name} demonstration`}
+                        className="img-fluid exercise-thumbnail"
                       />
-                    )}
-                    {/* Fallback to direct embed code if needed */}
-                    {!videoData.videoId && videoData.embedCode && (
-                      <div dangerouslySetInnerHTML={{ __html: videoData.embedCode }} />
-                    )}
+                      <div className="play-overlay" onClick={() => document.getElementById('exercise-video-player').scrollIntoView({ behavior: 'smooth' })}>
+                        <i className="bi bi-play-circle-fill"></i>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Coach notes */}
+                  {videoData.coachNotes && (
+                    <div className="coach-notes-container mb-3">
+                      <h5 className="coach-notes-title">
+                        <i className="bi bi-clipboard-check"></i> Coach Notes
+                      </h5>
+                      <p className="coach-notes-text">{videoData.coachNotes}</p>
+                    </div>
+                  )}
+                  
+                  {/* Video player */}
+                  <div className="video-wrapper" id="exercise-video-player">
+                    <div className="ratio ratio-16x9">
+                      {videoData.videoId ? (
+                        <>
+                          {/* Fallback message that will show if iframe fails to load */}
+                          <noscript>
+                            <div className="alert alert-warning">
+                              JavaScript is required to view this video. 
+                              <a href={`https://www.youtube.com/watch?v=${videoData.videoId}`} target="_blank" rel="noopener noreferrer">
+                                Watch on YouTube instead
+                              </a>.
+                            </div>
+                          </noscript>
+                          
+                          {/* Primary embed using iframe - most reliable across browsers */}
+                          <iframe
+                            src={`https://www.youtube-nocookie.com/embed/${videoData.videoId}?origin=https://nickcresner.github.io&modestbranding=1&playsinline=1&fs=1`}
+                            title={`${exercise.name} demonstration video`}
+                            width="100%"
+                            height="100%"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerPolicy="strict-origin-when-downgrade"
+                            loading="lazy"
+                            allowFullScreen
+                          ></iframe>
+                          
+                          {/* Fallback link that will be visible if iframe somehow fails */}
+                          <div className="youtube-error" style={{display: 'none'}}>
+                            Video could not be loaded. 
+                            <a href={`https://www.youtube.com/watch?v=${videoData.videoId}`} 
+                               className="btn btn-sm btn-primary mt-2"
+                               target="_blank" rel="noopener noreferrer">
+                              Watch on YouTube
+                            </a>
+                          </div>
+                        </>
+                      ) : videoData.embedCode ? (
+                        // Direct embed code as fallback
+                        <div dangerouslySetInnerHTML={{ __html: videoData.embedCode }} />
+                      ) : (
+                        // Ultimate fallback - no video available
+                        <div className="youtube-error">
+                          <p>No video available for this exercise.</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <p className="text-muted small mt-2">
                     Video courtesy of <a href="https://www.youtube.com/@pinnaclefhclub/videos" target="_blank" rel="noopener noreferrer">Pinnacle FH Club YouTube Channel</a>
                   </p>
                 </div>
               ) : (
-                <div className="alert alert-info">
-                  <p>No demonstration video found for this exercise.</p>
-                  <p>Check <a href="https://www.youtube.com/@pinnaclefhclub/videos" target="_blank" rel="noopener noreferrer">Pinnacle FH Club YouTube Channel</a> for exercise demonstrations.</p>
-                  <button 
-                    className="btn btn-outline-primary mt-2"
-                    onClick={() => window.open(`https://www.youtube.com/results?search_query=pinnacle+fh+club+${exercise.name.replace(/\s+/g, '+')}`, '_blank')}
-                  >
-                    Search for "{exercise.name}" on YouTube
-                  </button>
+                <div className="exercise-fallback">
+                  <div className="exercise-fallback-header">
+                    <h4>Exercise Technique Guide</h4>
+                  </div>
+                  
+                  {/* Coach notes even without video */}
+                  <div className="coach-notes-container mb-4">
+                    <h5 className="coach-notes-title">
+                      <i className="bi bi-clipboard-check"></i> Coach Notes
+                    </h5>
+                    <p className="coach-notes-text">{getCoachNotes(exercise.name)}</p>
+                  </div>
+                  
+                  <div className="no-video-container">
+                    <div className="no-video-icon">
+                      <i className="bi bi-film"></i>
+                    </div>
+                    <h5>Video Temporarily Unavailable</h5>
+                    <p>We couldn't find a demonstration video for <strong>{exercise.name}</strong> in our system.</p>
+                    <div className="fallback-options">
+                      <button 
+                        className="btn btn-primary mb-2"
+                        onClick={() => window.open(`https://www.youtube.com/@pinnaclefhclub/videos`, '_blank')}
+                      >
+                        <i className="bi bi-youtube me-2"></i>
+                        Visit Pinnacle FH Club Channel
+                      </button>
+                      <button 
+                        className="btn btn-outline-primary mb-2"
+                        onClick={() => window.open(`https://www.youtube.com/results?search_query=pinnacle+fh+club+${exercise.name.replace(/\s+/g, '+')}`, '_blank')}
+                      >
+                        <i className="bi bi-search me-2"></i>
+                        Search for "{exercise.name}"
+                      </button>
+                      <button 
+                        className="btn btn-outline-secondary"
+                        onClick={() => document.getElementById('coach-chat').scrollIntoView({ behavior: 'smooth' })}
+                      >
+                        <i className="bi bi-chat-dots me-2"></i>
+                        Ask a Coach
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -523,9 +614,88 @@ function ExerciseDetail({ workouts, updateExerciseHistory }) {
             </form>
           </div>
           
+          {/* Coach Chat Section */}
+          <div className="mt-5 coach-chat-section" id="coach-chat">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h4><i className="bi bi-headset me-2"></i> Coach Communication</h4>
+              <div className="coach-status">
+                <span className="coach-status-indicator online"></span>
+                <span className="coach-status-text">Coaches Available</span>
+              </div>
+            </div>
+            
+            <div className="chat-container">
+              <div className="chat-messages">
+                <div className="message coach-message">
+                  <div className="message-avatar">
+                    <img src={`${process.env.PUBLIC_URL}/images/logos/pinnaclelogo1.png`} alt="Coach" />
+                  </div>
+                  <div className="message-content">
+                    <div className="message-header">
+                      <span className="message-sender">Coach Michael</span>
+                      <span className="message-time">Yesterday at 3:45 PM</span>
+                    </div>
+                    <div className="message-body">
+                      <p>How's the {exercise.name} feeling? Remember to focus on form rather than weight initially. Let me know if you have any questions!</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="message user-message">
+                  <div className="message-content">
+                    <div className="message-header">
+                      <span className="message-sender">You</span>
+                      <span className="message-time">Yesterday at 5:30 PM</span>
+                    </div>
+                    <div className="message-body">
+                      <p>I'm feeling some discomfort in my lower back. Should I adjust my form?</p>
+                    </div>
+                  </div>
+                  <div className="message-avatar">
+                    <div className="user-avatar-placeholder">
+                      <i className="bi bi-person-fill"></i>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="message coach-message">
+                  <div className="message-avatar">
+                    <img src={`${process.env.PUBLIC_URL}/images/logos/pinnaclelogo1.png`} alt="Coach" />
+                  </div>
+                  <div className="message-content">
+                    <div className="message-header">
+                      <span className="message-sender">Coach Michael</span>
+                      <span className="message-time">Today at 9:15 AM</span>
+                    </div>
+                    <div className="message-body">
+                      <p>Good catch! For {exercise.name}, try lowering the weight by 10-15% and focus on engaging your core throughout the movement. Send me a video next session and I'll check your form.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="chat-input">
+                <textarea 
+                  className="form-control" 
+                  placeholder="Type your message to the coach here..."
+                  rows="2"
+                ></textarea>
+                <div className="chat-actions">
+                  <button className="btn btn-outline-secondary me-2">
+                    <i className="bi bi-paperclip"></i>
+                  </button>
+                  <button className="btn btn-primary">
+                    <i className="bi bi-send me-2"></i>
+                    Send
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           {/* Exercise History */}
           <div className="mt-5">
-            <h4>Exercise History</h4>
+            <h4><i className="bi bi-journal-text me-2"></i> Exercise History</h4>
             <div className="mb-3">
               <div className="form-check form-switch">
                 <input
@@ -591,9 +761,79 @@ function ExerciseDetail({ workouts, updateExerciseHistory }) {
               </div>
             ) : (
               <div className="alert alert-info">
-                No history recorded for this exercise yet. Log your first session above!
+                <p className="mb-0">No history recorded for this exercise yet. Log your first session above!</p>
               </div>
             )}
+          </div>
+          
+          {/* Community Discussion */}
+          <div className="mt-5 community-section">
+            <h4><i className="bi bi-people-fill me-2"></i> Community Discussion</h4>
+            <p className="text-muted mb-3">Connect with others working on {exercise.name}</p>
+            
+            <div className="community-posts">
+              <div className="community-post">
+                <div className="post-header d-flex align-items-center">
+                  <div className="post-avatar">
+                    <div className="user-avatar-placeholder">
+                      <i className="bi bi-person-fill"></i>
+                    </div>
+                  </div>
+                  <div className="post-meta">
+                    <div className="post-author">SarahRunner92</div>
+                    <div className="post-time">2 days ago</div>
+                  </div>
+                </div>
+                <div className="post-content">
+                  <p>I've found that doing this exercise with a slower tempo really helps engage the right muscles. Anyone else tried this?</p>
+                </div>
+                <div className="post-actions">
+                  <button className="btn btn-sm btn-outline-secondary">
+                    <i className="bi bi-hand-thumbs-up me-1"></i> 4 Likes
+                  </button>
+                  <button className="btn btn-sm btn-outline-secondary ms-2">
+                    <i className="bi bi-reply me-1"></i> Reply
+                  </button>
+                </div>
+              </div>
+              
+              <div className="community-post">
+                <div className="post-header d-flex align-items-center">
+                  <div className="post-avatar">
+                    <div className="user-avatar-placeholder">
+                      <i className="bi bi-person-fill"></i>
+                    </div>
+                  </div>
+                  <div className="post-meta">
+                    <div className="post-author">MarathonMike</div>
+                    <div className="post-time">5 days ago</div>
+                  </div>
+                </div>
+                <div className="post-content">
+                  <p>I struggled with this one initially but after watching the technique video it clicked. Make sure you're not rushing through the eccentric portion!</p>
+                </div>
+                <div className="post-actions">
+                  <button className="btn btn-sm btn-outline-secondary">
+                    <i className="bi bi-hand-thumbs-up me-1"></i> 7 Likes
+                  </button>
+                  <button className="btn btn-sm btn-outline-secondary ms-2">
+                    <i className="bi bi-reply me-1"></i> Reply
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="community-input mt-3">
+              <textarea 
+                className="form-control" 
+                placeholder="Share your experience or ask a question about this exercise..."
+                rows="2"
+              ></textarea>
+              <button className="btn btn-primary mt-2">
+                <i className="bi bi-chat-dots me-2"></i>
+                Post to Community
+              </button>
+            </div>
           </div>
         </div>
       </div>

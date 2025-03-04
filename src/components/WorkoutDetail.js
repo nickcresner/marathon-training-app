@@ -104,9 +104,9 @@ function WorkoutDetail({ workouts, currentPhase }) {
         <div className={isMobile ? "btn-stack-mobile mb-3" : ""}>
           <button 
             className="btn btn-outline-secondary me-2" 
-            onClick={() => navigate(`/week/${workout.week}`)}
+            onClick={() => navigate('/')}
           >
-            <i className="bi bi-arrow-left me-1"></i> Back to Week {workout.week}
+            <i className="bi bi-arrow-left me-1"></i> Back
           </button>
           
           <button 
@@ -129,12 +129,12 @@ function WorkoutDetail({ workouts, currentPhase }) {
         <div className="card-header bg-primary text-white">
           <div className="d-flex justify-content-between align-items-center">
             <h2 className="mb-0">{workout.title}</h2>
-            <span className="badge bg-light text-primary">{phase.name}</span>
+            <span className="badge bg-light text-primary">Week {phase.weekStart}-{phase.weekEnd}</span>
           </div>
         </div>
         <div className="card-body">
           <div className="mb-3">
-            <strong>Week:</strong> {workout.week} | 
+            <strong>Phase:</strong> Week {phase.weekStart}-{phase.weekEnd} | 
             <strong> Duration:</strong> {workout.duration}
           </div>
           
@@ -365,16 +365,42 @@ function WorkoutDetail({ workouts, currentPhase }) {
           {videoId && (
             <div className={`workout-video mb-3 ${isMobile ? 'mobile-video-container' : ''}`}>
               <h4>Workout Video</h4>
-              <div className="ratio ratio-16x9">
-                <YouTube 
-                  videoId={videoId} 
-                  opts={{
-                    playerVars: {
-                      rel: 0,
-                      playsinline: 1, // Better for iOS
-                    },
-                  }} 
-                />
+              <div className="video-wrapper">
+                <div className="ratio ratio-16x9">
+                  {/* Fallback message that will show if iframe fails to load */}
+                  <noscript>
+                    <div className="alert alert-warning">
+                      JavaScript is required to view this video. 
+                      <a href={`https://www.youtube.com/watch?v=${videoId}`} target="_blank" rel="noopener noreferrer">
+                        Watch on YouTube instead
+                      </a>.
+                    </div>
+                  </noscript>
+                  
+                  {/* Primary embed using iframe - most reliable across browsers */}
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${videoId}?origin=https://nickcresner.github.io&modestbranding=1&playsinline=1&fs=1`}
+                    title="Workout demonstration video"
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-downgrade"
+                    loading="lazy"
+                    allowFullScreen
+                    onError={(e) => console.error("YouTube iframe error:", e)}
+                  ></iframe>
+                  
+                  {/* Fallback link that will be visible if iframe somehow fails */}
+                  <div className="youtube-error" style={{display: 'none'}}>
+                    Video could not be loaded. 
+                    <a href={`https://www.youtube.com/watch?v=${videoId}`} 
+                       className="btn btn-sm btn-primary mt-2"
+                       target="_blank" rel="noopener noreferrer">
+                      Watch on YouTube
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           )}

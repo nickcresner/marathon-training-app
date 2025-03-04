@@ -4,6 +4,57 @@ import axios from 'axios';
 // Cache to avoid repeated API calls for the same exercise
 const videoCache = new Map();
 
+// YouTube channel to use for videos
+const YOUTUBE_CHANNEL = 'pinnaclefhclub';
+
+// GitHub Pages host URL - hardcoded for production
+const GITHUB_PAGES_URL = 'https://nickcresner.github.io';
+
+// Function to get thumbnail URL for a video ID
+export const getVideoThumbnail = (videoId) => {
+  // Use default thumbnail which is more reliably available
+  return `https://img.youtube.com/vi/${videoId}/default.jpg`;
+};
+
+// Sample coach notes for exercises
+const coachNotes = {
+  "Hip Bridge": "Focus on squeezing glutes at the top position. Keep core engaged throughout the movement.",
+  "Bench Press": "Drive through your feet and keep shoulder blades retracted. Control the descent.",
+  "DB Bench Press": "Keep wrists straight and elbows at a 45° angle to protect shoulders.",
+  "Horizontal Rows": "Pull shoulder blades together at the top and fully extend at the bottom.",
+  "Overhead Press": "Maintain a neutral spine and avoid excessive arching. Engage core throughout.",
+  "Pull Down": "Keep chest proud and avoid excessive leaning back. Full range of motion is key.",
+  "Bicep Curls": "Control the eccentric (lowering) portion. Keep elbows close to sides.",
+  "Tricep Extensions": "Lock elbows in position and focus on isolating the triceps.",
+  "Pallof Press": "Resist rotation - that's where the core work happens. Maintain good posture.",
+  "Deadbug": "Press lower back into the floor throughout the movement. Exhale on exertion.",
+  "Cat Cow": "Move slowly and coordinate movement with breath. Feel each vertebra articulate.",
+  "Shoulder Mobility": "Stay within pain-free range of motion. Quality over quantity.",
+  "Goblet Squat": "Keep chest up, knees in line with toes. Sit back as if to a chair.",
+  "RDL": "Maintain slight knee bend. Feel the stretch in hamstrings, not lower back.",
+  "Calf Raise": "Full range of motion - heels below platform at bottom, full extension at top.",
+  "Bird Dog": "Keep hips level and move opposing limbs with control. Focus on stability."
+};
+
+// Get coach notes for an exercise
+export const getCoachNotes = (exerciseName) => {
+  // Search for exact or partial match in coach notes
+  const exactMatch = coachNotes[exerciseName];
+  if (exactMatch) return exactMatch;
+  
+  // Look for partial matches
+  const exerciseNameLower = exerciseName.toLowerCase();
+  for (const [name, notes] of Object.entries(coachNotes)) {
+    if (exerciseNameLower.includes(name.toLowerCase()) || 
+        name.toLowerCase().includes(exerciseNameLower)) {
+      return notes;
+    }
+  }
+  
+  // Default note if no match found
+  return "Focus on proper form and controlled movements. Contact a coach for specific guidance on this exercise.";
+};
+
 // This would normally use the YouTube Data API with your API key
 // but for our exercise purposes, we'll use a simulation
 export const findExerciseVideo = async (exerciseName) => {
@@ -13,7 +64,7 @@ export const findExerciseVideo = async (exerciseName) => {
   }
   
   try {
-    // Pinnacle FH Club channel videos with both videoId and embed code
+    // Pinnacle FH Club channel videos with both videoId, embed code, and thumbnails
     const pinnacleVideos = [
       { 
         name: "Hip Bridge", 
@@ -159,10 +210,21 @@ export const findExerciseVideo = async (exerciseName) => {
     const matchingVideo = findMatchingVideo();
     
     if (matchingVideo) {
-      // Return both videoId and embedCode
+      // Return videoId, embedCode, thumbnail URL, and coach notes
+      // Update the embed code to use youtube-nocookie.com for GitHub Pages
+      const updatedEmbedCode = matchingVideo.embedCode.replace(
+        'https://www.youtube.com/embed/',
+        'https://www.youtube-nocookie.com/embed/'
+      ).replace(
+        'frameborder="0"',
+        'frameborder="0" referrerpolicy="strict-origin-when-downgrade"'
+      );
+      
       const result = {
         videoId: matchingVideo.videoId,
-        embedCode: matchingVideo.embedCode
+        embedCode: updatedEmbedCode,
+        thumbnailUrl: getVideoThumbnail(matchingVideo.videoId),
+        coachNotes: getCoachNotes(exerciseName)
       };
       videoCache.set(exerciseName, result);
       return result;
@@ -189,6 +251,7 @@ export const findExerciseVideo = async (exerciseName) => {
     videoCache.set(exerciseName, null);
     return null;
   } catch (error) {
+    // Keep YouTube API error logging for debugging purposes
     console.error('Error fetching YouTube video:', error);
     return null;
   }

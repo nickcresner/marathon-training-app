@@ -2,14 +2,14 @@
 import Papa from 'papaparse';
 
 // Data source configuration
-const USE_TEST_DATA = false; // Use real Google Sheet data
+const USE_TEST_DATA = false; // Use Google Sheet data
 const USE_LOCAL_CSV = false; // Not using local CSV for now
 const LOCAL_CSV_PATH = '/workouts.csv';
 
 // Google Sheet base URL - use this when connecting to Google Sheets
 // Using your actual published Google Sheet URL with a CORS proxy
 const GOOGLE_SHEET_BASE_URL = 'https://api.allorigins.win/raw?url=' + 
-  encodeURIComponent('https://docs.google.com/spreadsheets/d/1QtyPEKBS8Qfzzjp16kbSuZs0Cv4HjNgxlYObaLkYRJU/pub?output=csv');
+  encodeURIComponent('https://docs.google.com/spreadsheets/d/e/2PACX-1vSrR3SH3eMKp5DRVfYcHE6PBZvTQv3JfCsXQE9N84sQMfWUejiI6EG-sMU-a03I-Fb2fzYJWt5Xx5D3/pub?output=csv');
 
 // Available training phase tabs in the Google Sheet with their week ranges
 export const TRAINING_PHASES = [
@@ -48,8 +48,7 @@ export async function fetchWorkouts(phaseId = 'strength', userSheetUrl = null) {
     // Use test data if flag is set
     if (USE_TEST_DATA) {
       console.log(`Using test data for "${selectedPhase.name}"`);
-      const testWorkouts = createPhaseSpecificTestWorkouts(phaseId);
-      return testWorkouts;
+      return createTestDataByPhase(phaseId);
     }
     
     let url;
@@ -390,6 +389,105 @@ function createPhaseSpecificTestWorkouts(phaseId) {
   return testWorkouts;
 }
 
+// Function to create test data for each phase
+function createTestDataByPhase(phaseId) {
+  console.log(`Creating test data for phase: ${phaseId}`);
+  
+  // Create a set of workouts for each phase with all days included
+  const testWorkouts = [];
+  
+  // Phase-specific configuration
+  let weeks = [];
+  let workoutTitles = [];
+  
+  if (phaseId === 'strength') {
+    weeks = [1, 2, 3, 4];
+    workoutTitles = [
+      'Strength Foundations',
+      'Upper Body Focus',
+      'Lower Body Power',
+      'Core and Balance',
+      'Full Body Strength'
+    ];
+  } else if (phaseId === 'conditioning') {
+    weeks = [5, 6, 7, 8];
+    workoutTitles = [
+      'Speed Intervals',
+      'Hill Repeats',
+      'Tempo Run',
+      'Recovery Run',
+      'Long Endurance Run'
+    ];
+  } else if (phaseId === 'mobility') {
+    weeks = [9, 10, 11, 12];
+    workoutTitles = [
+      'Dynamic Flexibility',
+      'Core Stabilization',
+      'Balance and Coordination',
+      'Hip Mobility',
+      'Full Body Movement'
+    ];
+  } else {
+    // Default
+    weeks = [1, 2, 3, 4];
+    workoutTitles = [
+      'Basic Training A',
+      'Basic Training B',
+      'Basic Training C',
+      'Basic Training D',
+      'Basic Training E'
+    ];
+  }
+  
+  // Create workouts for each week
+  let workoutId = 1;
+  
+  weeks.forEach(week => {
+    // Create 5 workouts per week with days 1-5
+    for (let day = 1; day <= 5; day++) {
+      const title = `Day ${day}: ${workoutTitles[day-1]}`;
+      
+      // Create new workout
+      const workout = {
+        id: `${phaseId}-week${week}-day${day}`,
+        title: title,
+        description: `${phaseId.charAt(0).toUpperCase() + phaseId.slice(1)} training for week ${week}`,
+        phase: phaseId,
+        week: week,
+        day: `Day ${day}`,
+        dayNumber: day,
+        duration: '45-60 mins',
+        exercises: []
+      };
+      
+      // Add 4-6 exercises
+      const exerciseCount = 4 + Math.floor(Math.random() * 3);
+      for (let i = 1; i <= exerciseCount; i++) {
+        workout.exercises.push({
+          id: `${workout.id}-ex${i}`,
+          name: `Exercise ${i}`,
+          sets: `${3 + Math.floor(Math.random() * 2)}`,
+          reps: `${8 + Math.floor(Math.random() * 8)}`,
+          tempo: '2-0-2',
+          load: 'Medium',
+          rest: '60s',
+          notes: 'Focus on form',
+          history: [],
+          supersetId: i <= 2 ? 'A' : (i <= 4 ? 'B' : null),
+          supersetOrder: i % 2 === 1 ? 1 : 2,
+          isPartOfSuperset: i <= 4
+        });
+      }
+      
+      testWorkouts.push(workout);
+      workoutId++;
+    }
+  });
+  
+  console.log(`Created ${testWorkouts.length} test workouts for ${phaseId} phase`);
+  return testWorkouts;
+}
+
 // Helper to get random exercises for test data
 function getRandomExercise(phaseId, index) {
   const baseExercises = ['Squat', 'Romanian Deadlift', 'Bench Press', 'Shoulder Press', 'Row', 'Lunge'];
@@ -444,13 +542,29 @@ function processWorkoutData(rows, phaseId, historyData = {}) {
     text = text.trim().toLowerCase();
     
     // Match various formats like "Day 1", "day 1:", "day 1 -", etc.
-    if (text.startsWith('day ') && /\d/.test(text)) return true;
+    if (text.includes('day') && /\d/.test(text)) return true;
     
-    // Also match other common workout day headers
-    return [
+    // Also match other common workout day headers with more flexible pattern matching
+    const patterns = [
       'lower strength', 'upper strength', 'full body', 'running ip',
-      'workout a', 'workout b', 'workout c', 'workout d'
-    ].some(pattern => text.includes(pattern));
+      'workout a', 'workout b', 'workout c', 'workout d',
+      'power + strength', 'power and strength', 'power & strength',
+      'lower strength and conditioning'
+    ];
+    
+    // First check exact matches
+    const exactMatch = patterns.some(pattern => text.includes(pattern));
+    if (exactMatch) return true;
+    
+    // Then check more flexible pattern matching
+    return (
+      /power\s*[+&]\s*strength/i.test(text) ||
+      /lower\s*strength.*conditioning/i.test(text) ||
+      /upper\s*strength/i.test(text) ||
+      /full\s*body/i.test(text) ||
+      /running\s*ip/i.test(text) ||
+      /workout\s*[a-d]/i.test(text)
+    );
   };
   
   // Process each row from the spreadsheet
@@ -469,9 +583,20 @@ function processWorkoutData(rows, phaseId, historyData = {}) {
     const firstCol = columnValues[0] || '';
     const secondCol = columnValues[1] || '';
     
-    // Log row data for debugging
-    if (index < 20) {
+    // Enhanced logging for debugging special workouts
+    if (index < 20 || 
+        firstCol.toLowerCase().includes('day') || 
+        firstCol.toLowerCase().includes('power') || 
+        firstCol.toLowerCase().includes('strength') ||
+        secondCol.toLowerCase().includes('strength') ||
+        /power\s*[+&]\s*strength/i.test(firstCol + ' ' + secondCol) ||
+        /lower\s*strength.*conditioning/i.test(firstCol + ' ' + secondCol)) {
       console.log(`Row ${index}: ${columnValues.slice(0, 4).join(' | ')}`);
+      
+      // Additional debug info for potential workout headers
+      if (isDayHeader(firstCol) || isDayHeader(secondCol)) {
+        console.log(`  -> POTENTIAL WORKOUT HEADER DETECTED in row ${index}`);
+      }
     }
     
     // Skip empty rows
@@ -488,8 +613,25 @@ function processWorkoutData(rows, phaseId, historyData = {}) {
       }
     }
     
-    // Check if this row is a day header
-    if (isDayHeader(firstCol) || isDayHeader(secondCol)) {
+    // Check if this row is a day header or contains "Day X" pattern or specific workout types
+    const dayNumberRegex = /day\s*(\d+)/i;
+    
+    // Handle special cases for specific workout types - with more extensive pattern matching
+    const isSpecialWorkout = 
+      // Power + Strength workouts
+      (firstCol.toLowerCase().includes('power') && firstCol.toLowerCase().includes('strength')) ||
+      // Lower Strength and Conditioning workouts
+      (firstCol.toLowerCase().includes('lower') && firstCol.toLowerCase().includes('strength') && 
+       (firstCol.toLowerCase().includes('conditioning') || secondCol.toLowerCase().includes('conditioning'))) ||
+      // Additional flexibility for detecting these types with variations in spacing or format
+      /power\s*[+&]\s*strength/i.test(firstCol + ' ' + secondCol) ||
+      /lower\s*strength.*conditioning/i.test(firstCol + ' ' + secondCol);
+      
+    console.log(`Row ${index} - Special workout check: "${firstCol}" - Result: ${isSpecialWorkout}`);
+      
+    if (isDayHeader(firstCol) || isDayHeader(secondCol) || 
+        firstCol.match(dayNumberRegex) || secondCol.match(dayNumberRegex) ||
+        isSpecialWorkout) {
       // If we already have a workout in progress, save it
       if (currentWorkout) {
         workouts.push(currentWorkout);
@@ -508,6 +650,10 @@ function processWorkoutData(rows, phaseId, historyData = {}) {
       if (secondCol && secondCol.trim() !== '') {
         if (isDayHeader(firstCol) && !isDayHeader(secondCol)) {
           title = `${firstCol}: ${secondCol}`;
+        } else if (!isDayHeader(firstCol) && firstCol.toLowerCase().includes('day') && 
+                  firstCol.match(/day\s*\d+/i)) {
+          // This handles cases where "Day X" is not formatted as a header but is still a day marker
+          title = firstCol.trim();
         } else {
           title = secondCol.trim();
         }
@@ -668,7 +814,7 @@ function processWorkoutData(rows, phaseId, historyData = {}) {
   // If no workouts were found, create test data
   if (workouts.length === 0) {
     console.log("No workouts found in CSV, using test data");
-    return createPhaseSpecificTestWorkouts(phaseId);
+    return createTestDataByPhase(phaseId);
   }
   
   console.log(`Successfully processed ${workouts.length} workouts for ${phaseId} phase`);
@@ -683,14 +829,12 @@ function createTestWorkouts(phaseId) {
   
   // Use more weeks based on phaseId
   let weeks = [];
-  if (phaseId === 'base') {
+  if (phaseId === 'strength') {
     weeks = [1, 2, 3, 4];
-  } else if (phaseId === 'build') {
+  } else if (phaseId === 'conditioning') {
     weeks = [5, 6, 7, 8];
-  } else if (phaseId === 'peak') {
+  } else if (phaseId === 'mobility') {
     weeks = [9, 10, 11, 12];
-  } else if (phaseId === 'taper') {
-    weeks = [13, 14, 15, 16];
   } else {
     weeks = [1, 2, 3, 4]; // Fallback
   }
